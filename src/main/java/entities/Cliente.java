@@ -8,7 +8,6 @@ public class Cliente {
 	private String dni;
 
 	public Cliente(int id_Cliente, String nombre, String dni, String email, int telefono) {
-		super();
 		this.id_Cliente = id_Cliente;
 		this.nombre = nombre;
 		this.email = email;

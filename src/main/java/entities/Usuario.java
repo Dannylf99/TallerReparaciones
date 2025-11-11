@@ -6,12 +6,14 @@ public class Usuario {
 	private String nombre_usuario;
 	private String password;
 	private Rol rol;
+	private String dni;
 
-	public Usuario(int id_usuario, String nombre_usuario, String password, Rol rol) {
+	public Usuario(int id_usuario, String nombre_usuario, String dni, String password, Rol rol) {
 		super();
 		this.id_usuario = id_usuario;
 		this.nombre_usuario = nombre_usuario;
 		this.password = password;
+		this.dni = dni;
 		if (rol == Rol.Administrador | rol == Rol.Invitado | rol == Rol.Mecanico) {
 			this.rol = rol;
 		} else {
@@ -26,6 +28,16 @@ public class Usuario {
 
 	public void setId_usuario(int id_usuario) {
 		this.id_usuario = id_usuario;
+	}
+
+	
+	
+	public String getDni() {
+		return dni;
+	}
+
+	public void setDni(String dni) {
+		this.dni = dni;
 	}
 
 	public String getNombre_usuario() {

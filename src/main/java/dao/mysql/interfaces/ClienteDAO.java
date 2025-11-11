@@ -4,14 +4,14 @@ import java.util.ArrayList;
 
 import entities.Cliente;
 
-public interface ClienteInterface {
+public interface ClienteDAO {
 	int insert(Cliente c);
 
 	int update(Cliente c);
 
 	int delete(String dni);
 
-	ArrayList<ClienteInterface> findAll();
+	ArrayList<Cliente> findAll();
 
-	ClienteInterface findByDni(String dni);
+	Cliente findByDni(String dni);
 }

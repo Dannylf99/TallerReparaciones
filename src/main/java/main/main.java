@@ -2,6 +2,8 @@ package main;
 
 import java.sql.Connection;
 
+import org.omg.PortableInterceptor.ClientRequestInfo;
+
 import controlador.*;
 import dao.DBConnection;
 import vista.*;
@@ -13,5 +15,5 @@ public class main {
 	
 	ClienteDAOMySQL cliente = new ClienteDAOMySQL();
 	
-	cliente.
+	
 }

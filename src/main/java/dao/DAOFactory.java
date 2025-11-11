@@ -1,11 +1,7 @@
 package dao;
 
+import dao.mysql.interfaces.UsuarioDAO;
+
 public interface DAOFactory {
-	void insertarCliente();
-
-	void insertarUsuario();
-
-	void insertarVehiculo();
-
-	void insertarReparacion();
+	public UsuarioDAO getUsuarioDAO();
 }
