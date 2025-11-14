@@ -17,31 +17,52 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 	private Connection conexion;
 
 	DBConnection conexionJDBC = DBConnection.getInstance();
+	
+	public UsuarioDAOMySQL() {
+		conexion = DBConnection.getInstance().getConnection();
+	}
 
 	@Override
 	public int insert(Usuario u) {
 		try {
-			String sql = "INSERT INTO usuario(nombre_usuario, dni, password, rol) VALUES(?, ?, ?, ?)";
-			PreparedStatement pst = conexion.prepareStatement(sql);
+		    String sql = "INSERT INTO usuario(nombre_usuario, dni, password, rol) VALUES(?, ?, ?, ?)";
+		    
+		    // Prepare statement with option to return generated keys
+		    PreparedStatement pst = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		    
+		    pst.setString(1, u.getNombre_usuario());
+		    pst.setString(2, u.getDni());
+		    pst.setString(3, PasswordUtils.hashPassword(u.getPassword()));
+		    pst.setString(4, u.getRol().toString());
 
-			pst.setString(1, u.getNombre_usuario()); // Posicion 1, valor nombre
-			pst.setString(2, u.getDni()); // Posición 2, valor dni
-			pst.setString(3, u.getPassword()); // Posición 3, valor password
-			pst.setString(4, u.getRol().toString()); // Posición 4, valor rol;
+		    int resul = pst.executeUpdate();
+		    
+		    if (resul > 0) {
+		        System.out.println("> OK. Usuario insertado correctamente.");
+		        
+		        // Recuperar ID
+		        try (ResultSet generatedKeys = pst.getGeneratedKeys()) {
+		            if (generatedKeys.next()) {
+		                int id = generatedKeys.getInt(1);
+		                u.setId_usuario(id);
+		                System.out.println("> OK. ID recuperado correctamente: " + id);
+		            } else {
+		                System.out.println("> WARNING: No se pudo recuperar el ID del usuario.");
+		            }
+		        }
 
-			int resul = pst.executeUpdate();
-			if (resul > 0) {
-				System.out.println("> OK. Usuario insertado correctamente.");
-			} else {
-				System.out.println("> NOK. Persona no insertada.");
-				return -1;
-			}
+		    } else {
+		        System.out.println("> NOK. Usuario no insertado.");
+		        return -1;
+		    }
 
 		} catch (SQLException e) {
-			System.out.println("> NOK:" + e.getMessage());
-			return -1;
+		    System.out.println("> ERROR SQL: " + e.getMessage());
+		    return -1;
 		}
+
 		return 0;
+
 	}
 
 	@Override
@@ -51,7 +72,7 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 		String password = u.getPassword();
 		int id = u.getId_usuario();
 		String rol = u.getRol().toString().toUpperCase();
-		String sqlUpdate = "UPDATE usuario SET nombre_usuario = '" + nombre + "', dni= '" + dni + "', password= '" + password + "', rol= '" + rol + "' WHERE id = " + id + ";";
+		String sqlUpdate = "UPDATE usuario SET nombre_usuario = '" + nombre + "', dni= '" + dni + "', password= '" + password + "', rol= '" + rol + "' WHERE id_usuario = " + id + ";";
 		try {
 			PreparedStatement pst = conexion.prepareStatement(sqlUpdate);
 			int resul = pst.executeUpdate();
@@ -70,7 +91,25 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 
 	@Override
 	public int delete(String dni) {
-		// TODO Auto-generated method stub
+		try {
+			String sqlDelete = "DELETE FROM usuario WHERE dni = ?;";
+			PreparedStatement pst = conexion.prepareStatement(sqlDelete);
+
+			pst.setString(1, dni); // Posicion 1, valor 1
+
+			int resul = pst.executeUpdate();
+			
+			if (resul > 0) {
+				System.out.println("> OK. Usuario con dni" + dni + "eliminada correctamente.");
+			} else {
+				System.out.println("> NOK. Usuario no encontrado.");
+				return -1;
+			}
+
+		} catch (SQLException e) {
+			System.out.println("> NOK:" + e.getMessage());
+			return -1;
+		}
 		return 0;
 	}
 
@@ -99,51 +138,90 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 				
 				String dni = resultado.getString("dni");
 				
-				Usuario u = new Usuario(id,nombre,dni,password,rol);
+				Usuario u = new Usuario(nombre, dni, password, rol.toString());
+				
+				u.setId_usuario(id);
 				
 				usuarios.add(u);
+			}
+			return usuarios;
+			
+		} catch (SQLException e) {
+			System.out.println("> NOK:" + e.getMessage());
+			
+			return null;
+		}
+		
+	}
+
+	@Override
+	public Usuario findByDni(String dni) {
+	    String query = "SELECT * FROM usuario WHERE dni = ?";
+	    
+	    try (PreparedStatement stmt = conexion.prepareStatement(query)) {
+
+	        stmt.setString(1, dni);
+
+	        try (ResultSet resultado = stmt.executeQuery()) {
+
+	            if (!resultado.next()) {
+	                System.out.println("> Usuario no encontrado.");
+	                return null;
+	            }
+
+	            int id = resultado.getInt("id_usuario");
+	            String nombre = resultado.getString("nombre_usuario");
+	            String password = resultado.getString("password");
+	            String rolString = resultado.getString("rol");
+
+	            Rol rol = Rol.valueOf(rolString.toUpperCase());
+
+	            Usuario u = new Usuario(nombre, dni, password, rol.toString());
+	            u.setId_usuario(id);
+
+	            return u;
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("> Error al buscar usuario por DNI.");
+	        System.out.println("> Detalles: " + e.getMessage());
+	        return null;
+	    }
+	}
+
+	@Override
+	public boolean login(String dni, String contrasenia) {
+		PreparedStatement stmt = null;
+		ResultSet resultado = null;
+		
+		try {
+			String sqlPassword = "SELECT password FROM usuario WHERE dni = ?;";
+			PreparedStatement pst = conexion.prepareStatement(sqlPassword);
+
+			pst.setString(1, dni); // Posicion 1, valor 1
+
+			resultado = pst.executeQuery();
+			
+			if (!resultado.next()) {         
+	            return false;                 
+	        }
+			
+			String password = resultado.getString("password");
+			
+			if (PasswordUtils.verifyPassword(contrasenia, password)){
+				System.out.println("> Contraseña correcta");
+				return true;
+			} else {
+				return false;
 			}
 			
 		} catch (SQLException e) {
 			System.out.println("> NOK:" + e.getMessage());
 			
-			return null;
+			return false;
 		}
 		
-		return usuarios;
 	}
 
-	@Override
-	public Usuario findByDni(String dni) {
-		Statement stmt = null;
-		ResultSet resultado = null;
-		
-		try {
-			stmt = conexion.createStatement();
-			String find = "SELECT * FROM usuario WHERE dni = '" + dni + "';" ;
-			
-			resultado = stmt.executeQuery(find);
-		
-			int id = resultado.getInt("id_usuario");
-			
-			String nombre = resultado.getString("nombre_usuario");
-			
-			String password = resultado.getString("password");
-			
-			String rolString = resultado.getString("rol");
-			
-			Rol rol = Rol.valueOf(rolString.toUpperCase());
-			
-			Usuario u = new Usuario(id,nombre, dni, password, rol);
-		
-			return u;
-			
-		} catch (SQLException e) {
-			System.out.println("> NOK. Usuario no encontrado.");
-			System.out.println("> NOK:" + e.getMessage());
-			return null;
-		}
-	}
 
 
 }

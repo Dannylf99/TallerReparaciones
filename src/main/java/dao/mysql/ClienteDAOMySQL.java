@@ -22,29 +22,44 @@ public class ClienteDAOMySQL implements ClienteDAO {
 
 	@Override
 	public int insert(Cliente c) {
-		try {
-			String sql = "INSERT INTO cliente(nombre, dni, telefono, email) VALUES(?, ?, ?, ?)";
-			PreparedStatement pst = conexion.prepareStatement(sql);
+	    String sql = "INSERT INTO cliente(nombre, dni, telefono, email) VALUES(?, ?, ?, ?)";
+	    
+	    try (PreparedStatement pst = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+	        
+	        pst.setString(1, c.getNombre());
+	        pst.setString(2, c.getDni());
+	        pst.setInt(3, c.getTelefono());
+	        pst.setString(4, c.getEmail());
+	        
+	        int resul = pst.executeUpdate();
+	        
+	        if (resul > 0) {
+	            System.out.println("> OK. Cliente insertado correctamente.");
+	            
+	            // Recuperar ID generado
+	            try (ResultSet generatedKeys = pst.getGeneratedKeys()) {
+	                if (generatedKeys.next()) {
+	                    int id = generatedKeys.getInt(1);
+	                    c.setId_Cliente(id);
+	                    System.out.println("> OK. ID del cliente recuperado: " + id);
+	                    return id; 
+	                } else {
+	                    System.out.println("> WARNING: No se pudo recuperar el ID del cliente.");
+	                    return -1;
+	                }
+	            }
+	            
+	        } else {
+	            System.out.println("> NOK. Cliente no insertado.");
+	            return -1;
+	        }
 
-			pst.setString(1, c.getNombre()); // Posicion 1, valor nombre
-			pst.setString(2, c.getDni()); // Posición 2, valor dni
-			pst.setInt(3, c.getTelefono()); // Posición 3, valor teléfono
-			pst.setString(4, c.getEmail()); // Posición 4, valor email>;
-
-			int resul = pst.executeUpdate();
-			if (resul > 0) {
-				System.out.println("> OK. Persona insertada correctamente.");
-			} else {
-				System.out.println("> NOK. Persona no insertada.");
-				return -1;
-			}
-
-		} catch (SQLException e) {
-			System.out.println("> NOK:" + e.getMessage());
-			return -1;
-		}
-		return 0;
+	    } catch (SQLException e) {
+	        System.out.println("> ERROR SQL: " + e.getMessage());
+	        return -1;
+	    }
 	}
+
 
 	@Override
 	public int update(Cliente c) {

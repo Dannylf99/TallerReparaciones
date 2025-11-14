@@ -7,9 +7,7 @@ public class Vehiculo {
 	private String marca;
 	private int cliente_id;
 
-	public Vehiculo(int id_vehiculo, String matricula, String marca, int cliente_id) {
-		super();
-		this.id_vehiculo = id_vehiculo;
+	public Vehiculo(String matricula, String marca, int cliente_id) {
 		this.matricula = matricula;
 		this.marca = marca;
 		this.cliente_id = cliente_id;

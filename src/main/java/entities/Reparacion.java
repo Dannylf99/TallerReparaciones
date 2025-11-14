@@ -12,10 +12,8 @@ public class Reparacion {
 	private int vehiculo_id;
 	private int usuario_id;
 
-	public Reparacion(int id_reparacion, String descripcion, Date fecha_entrada, double coste_estimado, String estado,
+	public Reparacion(String descripcion, Date fecha_entrada, double coste_estimado, String estado,
 			int vehiculo_id, int usuario_id) {
-		super();
-		this.id_reparacion = id_reparacion;
 		this.descripcion = descripcion;
 		this.fecha_entrada = fecha_entrada;
 		this.coste_estimado = coste_estimado;

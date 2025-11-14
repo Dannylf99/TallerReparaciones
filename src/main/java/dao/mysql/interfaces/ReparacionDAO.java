@@ -2,15 +2,17 @@ package dao.mysql.interfaces;
 
 import java.util.ArrayList;
 
+import entities.Reparacion;
+
 public interface ReparacionDAO {
 
-	int insert(ReparacionDAO r);
+	int insert(Reparacion r);
 
-	int update(ReparacionDAO r);
+	int update(Reparacion r);
 
 	int delete(String matricula);
 
-	ArrayList<ReparacionDAO> findAll();
+	ArrayList<Reparacion> findAll();
 
-	ReparacionDAO findByDni(String matricula);
+	Reparacion findByMatricula(String matricula);
 }

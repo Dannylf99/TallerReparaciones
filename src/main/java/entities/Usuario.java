@@ -5,21 +5,21 @@ public class Usuario {
 	private int id_usuario;
 	private String nombre_usuario;
 	private String password;
-	private Rol rol;
+	//private Rol rol;
+	String rol;
 	private String dni;
 
-	public Usuario(int id_usuario, String nombre_usuario, String dni, String password, Rol rol) {
-		super();
-		this.id_usuario = id_usuario;
+	public Usuario(String nombre_usuario, String dni, String password, String rol) { //Rol rol) {
 		this.nombre_usuario = nombre_usuario;
 		this.password = password;
 		this.dni = dni;
-		if (rol == Rol.Administrador | rol == Rol.Invitado | rol == Rol.Mecanico) {
-			this.rol = rol;
-		} else {
-			System.out.println("El rol indicado no es válido, se le ha asignado el rol de Invitado.");
-			this.rol = Rol.Invitado;
-		}
+		this.rol = rol;
+//		if (rol == Rol.Administrador | rol == Rol.Invitado | rol == Rol.Mecanico) {
+//			this.rol = rol;
+//		} else {
+//			System.out.println("El rol indicado no es válido, se le ha asignado el rol de Invitado.");
+//			this.rol = Rol.Invitado;
+//		}
 	}
 
 	public int getId_usuario() {
@@ -56,17 +56,18 @@ public class Usuario {
 		this.password = password;
 	}
 
-	public Rol getRol() {
+	public /*Rol*/String getRol() {
 		return rol;
 	}
 
-	public void setRol(Rol rol) {
-		if (rol == Rol.Administrador | rol == Rol.Invitado | rol == Rol.Mecanico) {
-			this.rol = rol;
-		} else {
-			System.out.println("El rol indicado no es válido, se le ha asignado el rol de Invitado.");
-			this.rol = Rol.Invitado;
-		}
+	public void setRol(String rol)  { //Rol rol) {
+//		if (rol == Rol.Administrador | rol == Rol.Invitado | rol == Rol.Mecanico) {
+//			this.rol = rol;
+//		} else {
+//			System.out.println("El rol indicado no es válido, se le ha asignado el rol de Invitado.");
+//			this.rol = Rol.Invitado;
+//		}
+		this.rol = rol;
 	}
 
 }

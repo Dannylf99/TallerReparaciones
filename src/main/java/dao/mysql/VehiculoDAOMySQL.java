@@ -1,41 +1,178 @@
 package dao.mysql;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import dao.DBConnection;
 import dao.mysql.interfaces.*;
+import entities.Vehiculo;
 
-public class VehiculoDAOMySQL implements VehiculoInterface {
+public class VehiculoDAOMySQL implements VehiculoDAO {
+
+	private Connection conexion;
 
 	DBConnection conexionJDBC = DBConnection.getInstance();
+	
+	public VehiculoDAOMySQL() {
+		conexion = DBConnection.getInstance().getConnection();
+	}
+
 
 	@Override
-	public int insert(VehiculoInterface v) {
-		// TODO Auto-generated method stub
+	public int insert(Vehiculo v) {
+		int rc = 0;
+		try {
+			String sql = "INSERT INTO vehiculo(matricula, marca, cliente_id) VALUES(?, ?, ?)";
+			PreparedStatement pst = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+			pst.setString(1, v.getMatricula()); // Posicion 1, valor matricula
+			pst.setString(2, v.getMarca()); // Posición 2, valor marca
+			pst.setInt(3, v.getCliente_id()); // Posición 3, valor cliente_id
+
+			int resul = pst.executeUpdate();
+			if (resul > 0) {
+				System.out.println("> OK. Vehículo insertado correctamente.");
+			} else {
+				System.out.println("> NOK. Vehículo no insertado.");
+				return -1;
+			}
+			
+			try (ResultSet generatedKeys = pst.getGeneratedKeys()) {
+	            if (generatedKeys.next()) {
+	                int id = generatedKeys.getInt(1);
+	                v.setId_vehiculo(id);
+	                System.out.println("> ID del vehículo: " + id);
+	            } else {
+	                System.out.println("> WARNING: No se pudo recuperar el ID del vehículo.");
+	            }
+	        }
+
+		} catch (SQLException e) {
+			System.out.println("> NOK:" + e.getMessage());
+			return -1;
+		}
+		return rc;
+	}
+
+	@Override
+	public int update(Vehiculo v) {
+		
+		String matricula = v.getMatricula();
+		String marca = v.getMarca();
+		int id_cliente= v.getCliente_id();
+		int id = v.getId_vehiculo();
+		
+		String sqlUpdate = "UPDATE vehiculo SET matricula= '" + matricula + "', marca= '" + marca + "', cliente_id= '" + id_cliente + "' WHERE id_vehiculo = " + id + ";";
+		
+		try {
+			PreparedStatement pst = conexion.prepareStatement(sqlUpdate);
+			
+			int resul = pst.executeUpdate();
+			
+			if (resul > 0) {
+				System.out.println("> OK. Vehículo con id" + id + "actualizado correctamente.");
+			} else {
+				System.out.println("> NOK. Usuario no encontrado.");
+				return -1;
+			}
+			
+		} catch (SQLException e) {
+			System.out.println("> NOK:" + e.getMessage());
+			return -1;
+		}
 		return 0;
 	}
 
 	@Override
-	public int update(VehiculoInterface v) {
-		// TODO Auto-generated method stub
+	public int delete(String matricula) {
+		try {
+			String sqlDelete = "DELETE FROM vehiculo WHERE matricula= ?;";
+			PreparedStatement pst = conexion.prepareStatement(sqlDelete);
+
+			pst.setString(1, matricula); // Posicion 1, valor 1
+
+			int resul = pst.executeUpdate();
+			
+			if (resul > 0) {
+				System.out.println("> OK. Vehículo con matricula" + matricula + "eliminada correctamente.");
+			} else {
+				System.out.println("> NOK. Usuario no encontrado.");
+				return -1;
+			}
+
+		} catch (SQLException e) {
+			System.out.println("> NOK:" + e.getMessage());
+			return -1;
+		}
 		return 0;
 	}
 
 	@Override
-	public int delete(String id_reparacion) {
-		// TODO Auto-generated method stub
-		return 0;
+	public ArrayList<Vehiculo> findAll() {
+		Statement stmt = null;
+		ResultSet resultado = null;
+		ArrayList<Vehiculo> vehiculos = new ArrayList<Vehiculo>();
+		
+		try {
+			stmt = conexion.createStatement();
+			String sql = "SELECT * FROM vehiculo;";
+			resultado = stmt.executeQuery(sql);
+		
+			while (resultado.next()) {
+
+				int id = resultado.getInt("id_vehiculo");
+				
+				String matricula = resultado.getString("matricula");
+				
+				String marca = resultado.getString("marca");
+				
+				int idCliente = resultado.getInt("cliente_id");
+				
+				Vehiculo v = new Vehiculo(matricula,marca,idCliente);
+				v.setId_vehiculo(id);
+				
+				vehiculos.add(v);
+			}
+			
+		} catch (SQLException e) {
+			System.out.println("> NOK:" + e.getMessage());
+			
+			return null;
+		}
+		
+		return vehiculos;
 	}
 
 	@Override
-	public ArrayList<VehiculoInterface> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public VehiculoInterface findById(String id_reparacion) {
-		// TODO Auto-generated method stub
-		return null;
+	public Vehiculo findByMatricula(String matricula) {
+		Statement stmt = null;
+		ResultSet resultado = null;
+		
+		try {
+			stmt = conexion.createStatement();
+			String sql = "SELECT * FROM vehiculo WHERE matricula = ?;";
+			resultado = stmt.executeQuery(sql);
+					
+			int id = resultado.getInt("id_vehiculo");
+			
+			String marca = resultado.getString("marca");
+			
+			int idCliente = resultado.getInt("cliente_id");
+			
+			Vehiculo v = new Vehiculo(matricula,marca,idCliente);
+			v.setId_vehiculo(id);
+		
+			return v;
+			
+		} catch (SQLException e) {
+			System.out.println("> NOK. Vehículo no encontrado.");
+			System.out.println("> NOK:" + e.getMessage());
+			return null;
+		}
 	}
 }
+

@@ -1,13 +1,28 @@
 package dao;
 
-import dao.mysql.UsuarioDAOMySQL;
-import dao.mysql.interfaces.UsuarioDAO;
+import dao.mysql.*;
+import dao.mysql.interfaces.*;
 
 public class MySQLDAOFactory implements DAOFactory {
 
 	@Override
 	public UsuarioDAO getUsuarioDAO() {
 		return new UsuarioDAOMySQL();
+	}
+	
+	@Override
+	public ClienteDAO getClienteDAO() {
+		return new ClienteDAOMySQL();
+	}
+	
+	@Override
+	public ReparacionDAO getReparacionDAO() {
+		return new ReparacionDAOMySQL();
+	}
+	
+	@Override
+	public VehiculoDAO getVehiculoDAO() {
+		return new VehiculoDAOMySQL();
 	}
 	
 
