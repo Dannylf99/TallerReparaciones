@@ -13,17 +13,18 @@ import entities.Usuario;
 import entities.Vehiculo;
 
 public class ControladorTaller {
-
-    // Vehículo
-    private VehiculoDAOMySQL vehiculoDAO;
-
-    public ControladorTaller(VehiculoDAOMySQL daoVehiculo, ClienteDAOMySQL daoCliente,
+	
+	public ControladorTaller(VehiculoDAOMySQL daoVehiculo, ClienteDAOMySQL daoCliente,
                              UsuarioDAOMySQL daoUsuario, ReparacionDAOMySQL daoReparacion) {
         this.vehiculoDAO = daoVehiculo;
         this.clienteDAO = daoCliente;
         this.usuarioDAO = daoUsuario;
         this.reparacionDAO = daoReparacion;
     }
+	
+    // Vehículo
+	
+    private VehiculoDAOMySQL vehiculoDAO;
 
     public boolean crearVehiculo(String matricula, String marca, int clienteId) {
         Vehiculo v = new Vehiculo(matricula, marca, clienteId);
