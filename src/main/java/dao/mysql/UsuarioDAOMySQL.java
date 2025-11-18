@@ -72,7 +72,7 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 		String password = u.getPassword();
 		int id = u.getId_usuario();
 		String rol = u.getRol().toString().toUpperCase();
-		String sqlUpdate = "UPDATE usuario SET nombre_usuario = '" + nombre + "', dni= '" + dni + "', password= '" + password + "', rol= '" + rol + "' WHERE id_usuario = " + id + ";";
+		String sqlUpdate = "UPDATE usuario SET nombre_usuario = '" + nombre + "', dni= '" + dni + "', password= '" + password + "', rol= '" + rol + "' WHERE id_cliente = " + id + ";";
 		try {
 			PreparedStatement pst = conexion.prepareStatement(sqlUpdate);
 			int resul = pst.executeUpdate();
@@ -190,7 +190,6 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 
 	@Override
 	public boolean login(String dni, String contrasenia) {
-		PreparedStatement stmt = null;
 		ResultSet resultado = null;
 		
 		try {
@@ -211,6 +210,7 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 				System.out.println("> Contraseña correcta");
 				return true;
 			} else {
+				System.out.println("> Contraseña incorrecta");
 				return false;
 			}
 			

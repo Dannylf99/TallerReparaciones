@@ -76,7 +76,7 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 			if (resul > 0) {
 				System.out.println("> OK. Vehículo con id" + id + "actualizado correctamente.");
 			} else {
-				System.out.println("> NOK. Usuario no encontrado.");
+				System.out.println("> NOK. Vehículo no encontrado.");
 				return -1;
 			}
 			
@@ -149,30 +149,34 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 
 	@Override
 	public Vehiculo findByMatricula(String matricula) {
-		Statement stmt = null;
-		ResultSet resultado = null;
-		
-		try {
-			stmt = conexion.createStatement();
-			String sql = "SELECT * FROM vehiculo WHERE matricula = ?;";
-			resultado = stmt.executeQuery(sql);
-					
-			int id = resultado.getInt("id_vehiculo");
-			
-			String marca = resultado.getString("marca");
-			
-			int idCliente = resultado.getInt("cliente_id");
-			
-			Vehiculo v = new Vehiculo(matricula,marca,idCliente);
-			v.setId_vehiculo(id);
-		
-			return v;
-			
-		} catch (SQLException e) {
-			System.out.println("> NOK. Vehículo no encontrado.");
-			System.out.println("> NOK:" + e.getMessage());
-			return null;
-		}
+	    String sql = "SELECT * FROM vehiculo WHERE matricula = ?";
+
+	    try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+	        pst.setString(1, matricula);
+
+	        try (ResultSet rs = pst.executeQuery()) {
+
+	            if (!rs.next()) {
+	                System.out.println("> Vehículo no encontrado para matrícula: " + matricula);
+	                return null;
+	            }
+
+	            int id = rs.getInt("id_vehiculo");
+	            String marca = rs.getString("marca");
+	            int idCliente = rs.getInt("cliente_id");
+
+	            Vehiculo v = new Vehiculo(matricula, marca, idCliente);
+	            v.setId_vehiculo(id);
+
+	            return v;
+	        }
+
+	    } catch (SQLException e) {
+	        System.out.println("> NOK. Error al buscar vehículo.");
+	        System.out.println("> Detalles: " + e.getMessage());
+	        return null;
+	    }
 	}
+
 }
 

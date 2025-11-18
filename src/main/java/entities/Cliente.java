@@ -7,8 +7,8 @@ public class Cliente {
 	private int telefono;
 	private String dni;
 
-	public Cliente(int id_Cliente, String nombre, String dni, String email, int telefono) {
-		this.id_Cliente = id_Cliente;
+	public Cliente(String nombre, String dni, String email, int telefono) {
+		this.id_Cliente = 0;
 		this.nombre = nombre;
 		this.email = email;
 		this.dni = dni;

@@ -63,17 +63,20 @@ public class ClienteDAOMySQL implements ClienteDAO {
 
 	@Override
 	public int update(Cliente c) {
-		String nombre = c.getNombre();
-		String dni = c.getDni();
-		int telefono = c.getTelefono();
-		String email = c.getEmail();
-		int id = c.getId_Cliente();
-		String sqlUpdate = "UPDATE cliente SET nombre = '" + nombre + "', dni= '" + dni + "', telefono= '" + telefono + "', email= '" + email + "' WHERE id = " + id + ";";
+		String sqlUpdate = "UPDATE cliente SET nombre = ?, dni= ?, telefono= ?, email= ? WHERE id_cliente = ?";
+		
+
 		try {
 			PreparedStatement pst = conexion.prepareStatement(sqlUpdate);
+
+			pst.setString(1, c.getNombre());
+			pst.setString(2, c.getDni());
+			pst.setInt(3, c.getTelefono());
+			pst.setString(4, c.getEmail());
+			pst.setInt(5, c.getId_Cliente());
 			int resul = pst.executeUpdate();
 			if (resul > 0) {
-				System.out.println("> OK. Persona con id" + id + "actualizada correctamente.");
+				System.out.println("> OK. Persona con id" + c.getId_Cliente() + "actualizada correctamente.");
 			} else {
 				System.out.println("> NOK. Persona no encontrada.");
 				return -1;
@@ -117,7 +120,7 @@ public class ClienteDAOMySQL implements ClienteDAO {
 		
 		try {
 			stmt = conexion.createStatement();
-			String sql = "SELECT * FROM persona;";
+			String sql = "SELECT * FROM cliente;";
 			resultado = stmt.executeQuery(sql);
 		
 			while (resultado.next()) {
@@ -132,7 +135,9 @@ public class ClienteDAOMySQL implements ClienteDAO {
 				
 				String email = resultado.getString("email");
 				
-				Cliente c = new Cliente(id,nombre,dni,email,numTelefono);
+				Cliente c = new Cliente(nombre,dni,email,numTelefono);
+				
+				c.setId_Cliente(id);
 				
 				clientes.add(c);
 			}
@@ -148,25 +153,26 @@ public class ClienteDAOMySQL implements ClienteDAO {
 
 	@Override
 	public Cliente findByDni(String dni) {
-		Statement stmt = null;
-		ResultSet resultado = null;
-		
+		String sql = "SELECT * FROM cliente WHERE dni = ?";
 		try {
-			stmt = conexion.createStatement();
-			String find = "SELECT * FROM persona WHERE dni = '" + dni + "';" ;
-			resultado = stmt.executeQuery(find);
+		PreparedStatement pst = conexion.prepareStatement(sql);
+		pst.setString(1, dni);
+		ResultSet resultado = pst.executeQuery();
+
+		if (!resultado.next()) {
+		    System.out.println("> Cliente no encontrado.");
+		    return null;
+		}
+ 
+		int id = resultado.getInt("id_cliente");
+		String nombre = resultado.getString("nombre");
+		int telefono = resultado.getInt("telefono");
+		String email = resultado.getString("email");
+
+		Cliente c = new Cliente(nombre, dni, email, telefono);
 		
-			int id = resultado.getInt("id_cliente");
-			
-			String nombre = resultado.getString("nombre");
-			
-			int numTelefono = resultado.getInt("telefono");
-			
-			String email = resultado.getString("email");
-			
-			Cliente c = new Cliente(id,nombre,dni,email,numTelefono);
-		
-			return c;
+		c.setId_Cliente(id);
+		return c;
 			
 		} catch (SQLException e) {
 			System.out.println("> NOK. Persona no encontrada.");

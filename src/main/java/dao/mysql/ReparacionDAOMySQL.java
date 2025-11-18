@@ -125,14 +125,71 @@ public class ReparacionDAOMySQL implements ReparacionDAO {
 
 	@Override
 	public ArrayList<Reparacion> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+	    ArrayList<Reparacion> reparaciones = new ArrayList<>();
+
+	    String sql = "SELECT * FROM reparacion";
+
+	    try (Statement stmt = conexion.createStatement();
+	         ResultSet rs = stmt.executeQuery(sql)) {
+
+	        while (rs.next()) {
+	            int id = rs.getInt("id_reparacion");
+	            String descripcion = rs.getString("descripcion");
+	            Date fechaEntrada = rs.getDate("fecha_entrada");
+	            double costeEstimado = rs.getDouble("coste_estimado");
+	            String estado = rs.getString("estado");
+	            int vehiculoId = rs.getInt("vehiculo_id");
+	            int usuarioId = rs.getInt("usuario_id");
+
+	            Reparacion r = new Reparacion(descripcion, fechaEntrada, costeEstimado, estado, vehiculoId, usuarioId);
+	            r.setId_reparacion(id);
+
+	            reparaciones.add(r);
+	        }
+
+	    } catch (SQLException e) {
+	        System.out.println("> NOK: Error al listar reparaciones.");
+	        System.out.println("> Detalles: " + e.getMessage());
+	        return null;
+	    }
+
+	    return reparaciones;
 	}
 
 	@Override
 	public Reparacion findByMatricula(String matricula) {
-		// TODO Auto-generated method stub
-		return null;
+	    String sql = "SELECT r.* FROM reparacion r "
+	               + "JOIN vehiculo v ON r.vehiculo_id = v.id_vehiculo "
+	               + "WHERE v.matricula = ?";
+
+	    try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+	        pst.setString(1, matricula);
+
+	        try (ResultSet rs = pst.executeQuery()) {
+	            if (!rs.next()) {
+	                System.out.println("> Reparación no encontrada para matrícula: " + matricula);
+	                return null;
+	            }
+
+	            int id = rs.getInt("id_reparacion");
+	            String descripcion = rs.getString("descripcion");
+	            Date fechaEntrada = rs.getDate("fecha_entrada");
+	            double costeEstimado = rs.getDouble("coste_estimado");
+	            String estado = rs.getString("estado");
+	            int vehiculoId = rs.getInt("vehiculo_id");
+	            int usuarioId = rs.getInt("usuario_id");
+
+	            Reparacion r = new Reparacion(descripcion, fechaEntrada, costeEstimado, estado, vehiculoId, usuarioId);
+	            r.setId_reparacion(id);
+	            
+	            return r;
+	        }
+
+	    } catch (SQLException e) {
+	        System.out.println("> NOK: Error al buscar reparación por matrícula.");
+	        System.out.println("> Detalles: " + e.getMessage());
+	        return null;
+	    }
 	}
 
 }
