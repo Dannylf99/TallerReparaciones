@@ -72,7 +72,7 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 		String password = u.getPassword();
 		int id = u.getId_usuario();
 		String rol = u.getRol().toString().toUpperCase();
-		String sqlUpdate = "UPDATE usuario SET nombre_usuario = '" + nombre + "', dni= '" + dni + "', password= '" + password + "', rol= '" + rol + "' WHERE id_cliente = " + id + ";";
+		String sqlUpdate = "UPDATE usuario SET nombre_usuario = '" + nombre + "', dni= '" + dni + "', password= '" + password + "', rol= '" + rol + "' WHERE id_usuario = " + id + ";";
 		try {
 			PreparedStatement pst = conexion.prepareStatement(sqlUpdate);
 			int resul = pst.executeUpdate();
