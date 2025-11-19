@@ -86,7 +86,7 @@ public class ReparacionDAOMySQL implements ReparacionDAO {
 			int resul = pst.executeUpdate();
 			
 			if (resul > 0) {
-				System.out.println("> OK. Reparación con id" + id + "actualizada correctamente.");
+				System.out.println("> OK. Reparación con id " + id + " actualizada correctamente.");
 			} else {
 				System.out.println("> NOK. Reparación no encontrada.");
 				return -1;
@@ -158,46 +158,37 @@ public class ReparacionDAOMySQL implements ReparacionDAO {
 
 	@Override
 	public ArrayList<Reparacion> findByMatricula(String matricula) {
-	    String sql = "SELECT r.* FROM reparacion r "
-	               + "JOIN vehiculo v ON r.vehiculo_id = v.id_vehiculo "
-	               + "WHERE v.matricula = ?";
-
 	    ArrayList<Reparacion> lista = new ArrayList<>();
+	    String sql = "SELECT r.* FROM reparacion r " +
+	                 "JOIN vehiculo v ON r.vehiculo_id = v.id_vehiculo " +
+	                 "WHERE v.matricula = ?";
 
-	    try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+	    try {
+	        PreparedStatement pst = conexion.prepareStatement(sql);
 	        pst.setString(1, matricula);
+	        ResultSet rs = pst.executeQuery();
 
-	        try (ResultSet rs = pst.executeQuery()) {
-
-	            while (rs.next()) {
-	                int id = rs.getInt("id_reparacion");
-	                String descripcion = rs.getString("descripcion");
-	                Date fechaEntrada = rs.getDate("fecha_entrada");
-	                double costeEstimado = rs.getDouble("coste_estimado");
-	                String estado = rs.getString("estado");
-	                int vehiculoId = rs.getInt("vehiculo_id");
-	                int usuarioId = rs.getInt("usuario_id");
-
-	                Reparacion r = new Reparacion(descripcion, fechaEntrada, costeEstimado,
-	                                              estado, vehiculoId, usuarioId);
-	                r.setId_reparacion(id);
-
-	                lista.add(r);
-	            }
+	        while (rs.next()) {
+	            Reparacion r = new Reparacion(
+	                rs.getString("descripcion"),
+	                rs.getDate("fecha_entrada"),
+	                rs.getDouble("coste_estimado"),
+	                rs.getString("estado"),
+	                rs.getInt("vehiculo_id"),
+	                rs.getInt("usuario_id")
+	            );
+	            r.setId_reparacion(rs.getInt("id_reparacion"));
+	            lista.add(r);
 	        }
-
-	        if (lista.isEmpty()) {
-	            System.out.println("> No hay reparaciones para matrícula: " + matricula);
-	        }
-
-	        return lista;
-
 	    } catch (SQLException e) {
-	        System.out.println("> NOK: Error al buscar reparaciones por matrícula.");
-	        System.out.println("> Detalles: " + e.getMessage());
-	        return null;
+	        System.out.println("Error en findByMatricula: " + e.getMessage());
 	    }
+
+	    return lista;
 	}
+
+
+
 
 
 

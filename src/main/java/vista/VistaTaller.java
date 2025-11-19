@@ -34,8 +34,14 @@ public class VistaTaller {
             System.out.println("0. Salir");
             System.out.print("Seleccione una opción: ");
 
-            opcion = sc.nextInt();
-            sc.nextLine();
+            String input = sc.nextLine();
+            try {
+                opcion = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Opción no válida");
+                opcion = -1;
+                continue;
+            }
 
             switch (opcion) {
 
@@ -108,8 +114,7 @@ public class VistaTaller {
                 break;
 
             case 0:
-                System.out.println("Sesión cerrada");
-                iniciar();
+                return;
             default:
                 System.out.println("Opción incorrecta");
             }
@@ -139,30 +144,30 @@ public class VistaTaller {
         System.out.print("Matricula: ");
         String id = sc.nextLine();
         String estado = "";
-        sc.nextLine();
         boolean correcto = false;
 
-        while(correcto) {
-        System.out.println("> Nuevo estado:");
-        System.out.println("1. En reparación");
-        System.out.println("2. Finalizada");
-        System.out.println("> Introduce el estado que deseas: ");
-        int estadoNum = sc.nextInt();
-        
-        if (estadoNum == 1) {
-        	estado = "EN REPARACIÓN";
-        	correcto = true;
-        } else if(estadoNum == 2){
-        	estado = "FINALIZADO";
-        	correcto = true;
-        }else {
-        	System.out.println("> La opción introducida no es correcta.");
+        while(!correcto) {
+            System.out.println("> Nuevo estado:");
+            System.out.println("1. En reparación");
+            System.out.println("2. Finalizada");
+            System.out.print("> Introduce el estado que deseas: ");
+            int estadoNum = sc.nextInt();
+            sc.nextLine(); // limpiar buffer
+
+            if (estadoNum == 1) {
+                estado = "EN REPARACIÓN";
+                correcto = true;
+            } else if(estadoNum == 2) {
+                estado = "FINALIZADO";
+                correcto = true;
+            } else {
+                System.out.println("> La opción introducida no es correcta.");
+            }
         }
-        }
-        sc.nextLine();
 
         controlador.cambiarEstado(id, estado);
     }
+
 
     private void menuAdmin() {
         int opcion = -1;
@@ -192,8 +197,7 @@ public class VistaTaller {
                 break;
 
             case 0:
-                System.out.println("Sesión cerrada");
-                iniciar();
+                return;
             default:
                 System.out.println("Opción incorrecta");
             }
@@ -256,12 +260,18 @@ public class VistaTaller {
             ClienteDAOMySQL daoCliente = new ClienteDAOMySQL();
             UsuarioDAOMySQL daoUsuario = new UsuarioDAOMySQL();
             ReparacionDAOMySQL daoReparacion = new ReparacionDAOMySQL();
+            Usuario inicioAdmin = new Usuario("Gonzalo","12345678Z","gonzalo","ADMINISTRADOR");
+            Usuario inicioMecanico = new Usuario("Gonzalo","12345678A","gonzalo","MECANICO");
+            daoUsuario.insert(inicioAdmin);
+            daoUsuario.insert(inicioMecanico);
 
             // Inicializamos el controlador singleton
             ControladorTaller.init(daoVehiculo, daoCliente, daoUsuario, daoReparacion);
 
             // Ahora sí podemos usar la vista
             VistaTaller vista = new VistaTaller();
+            System.out.println("\n>(ADMIN)Usuario creado:\n>DNI: 12345678Z, Contraseña: gonzalo\n");
+            System.out.println("\n>(MECANICO)Usuario creado:\n>DNI: 12345678A, Contraseña: gonzalo\n");
             vista.iniciar();
         }
     }

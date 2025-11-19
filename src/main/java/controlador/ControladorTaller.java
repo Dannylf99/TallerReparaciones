@@ -46,9 +46,17 @@ public class ControladorTaller {
             System.out.println("No hay reparaciones finalizadas.");
             return;
         }
-
+        
+        int n = 1;
         for (Reparacion r : lista) {
-            System.out.println(r.toString());
+        	System.out.println(n + ". ID: " + r.getId_reparacion() 
+            + ", Descripción: " + r.getDescripcion()
+            + ", Fecha de entrada: " + r.getFecha_entrada()
+            + ", Coste estimado: " + r.getCoste_estimado()
+            + ", Estado: " + r.getEstado()
+            + ", Vehículo ID: " + r.getVehiculo_id()
+            + ", Usuario ID: " + r.getUsuario_id());
+            n++;
         }
     }
 
@@ -81,44 +89,47 @@ public class ControladorTaller {
     }
 
     public void cambiarEstado(String matricula, String estado) {
-    	ArrayList<Reparacion> lista = reparacionDAO.findByMatricula(matricula);
-    	
-    	
-    	System.out.println("> Seleccione la reparación que desea cambiar, introduciendo el id que se indica:");
-    	
-    	for (Reparacion reparacion : lista) {
-    		System.out.println("> Id: " + reparacion.getId_reparacion() + ". Descripción: " + reparacion.getDescripcion() + 
-    				". Fecha entrada: " + reparacion.getFecha_entrada() + ". Coste estimado: " + reparacion.getCoste_estimado());
-    	}
-    	
-    	System.out.println("> Seleccione el id:");
-    	Scanner sc = new Scanner(System.in);
-		int id = sc.nextInt();
-		
-		/*
-		 Se comprueba que el id está dentro de las reparaciones, si no la r
-		 será null y no se podrá realizar.
-		 */
-		Reparacion r = null;
-		
-		for(Reparacion reparacion : lista) {
-			if(reparacion.getId_reparacion() == id) {
-				r = reparacionDAO.findById(id);
-				break;
-				}
-		}
-    	
-        
+        ArrayList<Reparacion> lista = reparacionDAO.findByMatricula(matricula);
+
+        if (lista.isEmpty()) {
+            System.out.println("> No hay reparaciones para esa matrícula.");
+            return;
+        }
+
+        System.out.println("> Seleccione la reparación que desea cambiar, introduciendo el id que se indica:");
+
+        for (Reparacion reparacion : lista) {
+            System.out.println("> Id: " + reparacion.getId_reparacion() + 
+                               ". Descripción: " + reparacion.getDescripcion() + 
+                               ". Fecha entrada: " + reparacion.getFecha_entrada() + 
+                               ". Coste estimado: " + reparacion.getCoste_estimado());
+        }
+
+        System.out.println("> Seleccione el id:");
+        Scanner sc = new Scanner(System.in);
+        int id = sc.nextInt();
+        sc.nextLine(); // limpiar buffer
+
+        // Buscamos la reparación directamente en la lista
+        Reparacion r = null;
+        for (Reparacion reparacion : lista) {
+            if (reparacion.getId_reparacion() == id) {
+                r = reparacion;
+                break;
+            }
+        }
+
         if (r == null) {
-            System.out.println("Reparación no encontrada.");
+            System.out.println("> Reparación no encontrada.");
             return;
         }
 
         r.setEstado(estado);
-
         reparacionDAO.update(r);
-        System.out.println("Estado actualizado.");
+
+        System.out.println("> Estado actualizado.");
     }
+
 
     public void altaCliente() {
         System.out.println("Alta de cliente no implementada en este snippet.");
