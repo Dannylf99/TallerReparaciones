@@ -2,6 +2,7 @@ package controlador;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import dao.mysql.ClienteDAOMySQL;
 import dao.mysql.ReparacionDAOMySQL;
@@ -13,114 +14,141 @@ import entities.Usuario;
 import entities.Vehiculo;
 
 public class ControladorTaller {
-	
-	public ControladorTaller(VehiculoDAOMySQL daoVehiculo, ClienteDAOMySQL daoCliente,
-                             UsuarioDAOMySQL daoUsuario, ReparacionDAOMySQL daoReparacion) {
-        this.vehiculoDAO = daoVehiculo;
-        this.clienteDAO = daoCliente;
-        this.usuarioDAO = daoUsuario;
-        this.reparacionDAO = daoReparacion;
+
+    private static ControladorTaller instance;
+
+    public static ControladorTaller getInstance() {
+        return instance;
     }
-	
-    // Vehículo
-	
+
+    public static void init(VehiculoDAOMySQL daoVehiculo, ClienteDAOMySQL daoCliente,
+                            UsuarioDAOMySQL daoUsuario, ReparacionDAOMySQL daoReparacion) {
+        instance = new ControladorTaller(daoVehiculo, daoCliente, daoUsuario, daoReparacion);
+    }
+
+    private ControladorTaller(VehiculoDAOMySQL v, ClienteDAOMySQL c,
+                              UsuarioDAOMySQL u, ReparacionDAOMySQL r) {
+        vehiculoDAO = v;
+        clienteDAO = c;
+        usuarioDAO = u;
+        reparacionDAO = r;
+    }
+
     private VehiculoDAOMySQL vehiculoDAO;
-
-    public boolean crearVehiculo(String matricula, String marca, int clienteId) {
-        Vehiculo v = new Vehiculo(matricula, marca, clienteId);
-        return vehiculoDAO.insert(v) == 0;
-    }
-
-    public Vehiculo buscarVehiculo(String matricula) {
-        return vehiculoDAO.findByMatricula(matricula);
-    }
-
-    public ArrayList<Vehiculo> listarVehiculos() {
-        return vehiculoDAO.findAll();
-    }
-
-    public boolean actualizarVehiculo(Vehiculo v) {
-        return vehiculoDAO.update(v) == 0;
-    }
-
-    public boolean borrarVehiculo(String matricula) {
-        return vehiculoDAO.delete(matricula) == 0;
-    }
-
-    // Cliente
     private ClienteDAOMySQL clienteDAO;
-
-    public boolean crearCliente(String nombre, String dni, int telefono, String email) {
-        Cliente c = new Cliente(nombre, dni, email, telefono);
-        return clienteDAO.insert(c) != -1;
-    }
-
-    public Cliente buscarCliente(String dni) {
-        return clienteDAO.findByDni(dni);
-    }
-
-    public ArrayList<Cliente> listarClientes() {
-        return clienteDAO.findAll();
-    }
-
-    public boolean actualizarCliente(Cliente c) {
-        return clienteDAO.update(c) == 0;
-    }
-
-    public boolean borrarCliente(String dni) {
-        return clienteDAO.delete(dni) == 0;
-    }
-
-    // Usuario
     private UsuarioDAOMySQL usuarioDAO;
+    private ReparacionDAOMySQL reparacionDAO;
 
-    public boolean crearUsuario(String nombre, String dni, String password, String rol) {
-        Usuario u = new Usuario(nombre, dni, password, rol);
-        return usuarioDAO.insert(u) == 0;
+    public void verReparacionesFinalizadas() {
+        ArrayList<Reparacion> lista = reparacionDAO.findFinalizadas();
+
+        if (lista.isEmpty()) {
+            System.out.println("No hay reparaciones finalizadas.");
+            return;
+        }
+
+        for (Reparacion r : lista) {
+            System.out.println(r.toString());
+        }
     }
 
-    public Usuario buscarUsuario(String dni) {
+    public Usuario login(String dni, String pass) {
+        boolean ok = usuarioDAO.login(dni, pass);
+        if (!ok) return null;
+
         return usuarioDAO.findByDni(dni);
     }
 
-    public ArrayList<Usuario> listarUsuarios() {
-        return usuarioDAO.findAll();
+    public void registrarReparacion(String matricula, String desc, double coste, String fecha, String dni) {
+        Vehiculo v = vehiculoDAO.findByMatricula(matricula);
+
+        if (v == null) {
+            System.out.println("Vehículo no encontrado");
+            return;
+        }
+
+        Usuario u = usuarioDAO.findByDni(dni);
+        if (u == null) {
+            System.out.println("Error: no hay usuario logueado.");
+            return;
+        }
+
+        Reparacion r = new Reparacion(desc, Date.valueOf(fecha), coste, "EN REPARACIÓN",
+                v.getId_vehiculo(), u.getId_usuario());
+
+        reparacionDAO.insert(r);
+        System.out.println("Reparación registrada.");
     }
 
-    public boolean actualizarUsuario(Usuario u) {
-        return usuarioDAO.update(u) == 0;
+    public void cambiarEstado(String matricula, String estado) {
+    	ArrayList<Reparacion> lista = reparacionDAO.findByMatricula(matricula);
+    	
+    	
+    	System.out.println("> Seleccione la reparación que desea cambiar, introduciendo el id que se indica:");
+    	
+    	for (Reparacion reparacion : lista) {
+    		System.out.println("> Id: " + reparacion.getId_reparacion() + ". Descripción: " + reparacion.getDescripcion() + 
+    				". Fecha entrada: " + reparacion.getFecha_entrada() + ". Coste estimado: " + reparacion.getCoste_estimado());
+    	}
+    	
+    	System.out.println("> Seleccione el id:");
+    	Scanner sc = new Scanner(System.in);
+		int id = sc.nextInt();
+		
+		/*
+		 Se comprueba que el id está dentro de las reparaciones, si no la r
+		 será null y no se podrá realizar.
+		 */
+		Reparacion r = null;
+		
+		for(Reparacion reparacion : lista) {
+			if(reparacion.getId_reparacion() == id) {
+				r = reparacionDAO.findById(id);
+				break;
+				}
+		}
+    	
+        
+        if (r == null) {
+            System.out.println("Reparación no encontrada.");
+            return;
+        }
+
+        r.setEstado(estado);
+
+        reparacionDAO.update(r);
+        System.out.println("Estado actualizado.");
     }
 
-    public boolean borrarUsuario(String dni) {
-        return usuarioDAO.delete(dni) == 0;
+    public void altaCliente() {
+        System.out.println("Alta de cliente no implementada en este snippet.");
     }
 
-    public boolean loginUsuario(String dni, String contrasenia) {
-        return usuarioDAO.login(dni, contrasenia);
+    public void bajaCliente() {
+        System.out.println("Baja de cliente no implementada en este snippet.");
     }
 
-    // Reparación
-    private ReparacionDAOMySQL reparacionDAO;
-
-    public boolean crearReparacion(String descripcion, Date fechaEntrada, double costeEstimado,
-                                   String estado, int vehiculoId, int usuarioId) {
-        Reparacion r = new Reparacion(descripcion, fechaEntrada, costeEstimado, estado, vehiculoId, usuarioId);
-        return reparacionDAO.insert(r) == 0;
+    public void modificarCliente() {
+        System.out.println("Modificar cliente no implementado en este snippet.");
     }
 
-    public Reparacion buscarReparacionPorMatricula(String matricula) {
-        return reparacionDAO.findByMatricula(matricula);
+    public void altaVehiculo() {
+        System.out.println("Alta de vehículo no implementada.");
     }
 
-    public ArrayList<Reparacion> listarReparaciones() {
-        return reparacionDAO.findAll();
+    public void bajaVehiculo() {
+        System.out.println("Baja de vehículo no implementada.");
     }
 
-    public boolean actualizarReparacion(Reparacion r) {
-        return reparacionDAO.update(r) == 0;
+    public void modificarVehiculo() {
+        System.out.println("Modificar vehículo no implementado.");
     }
 
-    public boolean borrarReparacion(String matricula) {
-        return reparacionDAO.delete(matricula) == 0;
+    public void mostrarEstadisticas() {
+        int total = reparacionDAO.findAll().size();
+        int finalizadas = reparacionDAO.countFinalizadas();
+
+        System.out.println("Total reparaciones: " + total);
+        System.out.println("Finalizadas: " + finalizadas);
     }
 }

@@ -157,39 +157,100 @@ public class ReparacionDAOMySQL implements ReparacionDAO {
 	}
 
 	@Override
-	public Reparacion findByMatricula(String matricula) {
+	public ArrayList<Reparacion> findByMatricula(String matricula) {
 	    String sql = "SELECT r.* FROM reparacion r "
 	               + "JOIN vehiculo v ON r.vehiculo_id = v.id_vehiculo "
 	               + "WHERE v.matricula = ?";
+
+	    ArrayList<Reparacion> lista = new ArrayList<>();
 
 	    try (PreparedStatement pst = conexion.prepareStatement(sql)) {
 	        pst.setString(1, matricula);
 
 	        try (ResultSet rs = pst.executeQuery()) {
-	            if (!rs.next()) {
-	                System.out.println("> Reparación no encontrada para matrícula: " + matricula);
-	                return null;
+
+	            while (rs.next()) {
+	                int id = rs.getInt("id_reparacion");
+	                String descripcion = rs.getString("descripcion");
+	                Date fechaEntrada = rs.getDate("fecha_entrada");
+	                double costeEstimado = rs.getDouble("coste_estimado");
+	                String estado = rs.getString("estado");
+	                int vehiculoId = rs.getInt("vehiculo_id");
+	                int usuarioId = rs.getInt("usuario_id");
+
+	                Reparacion r = new Reparacion(descripcion, fechaEntrada, costeEstimado,
+	                                              estado, vehiculoId, usuarioId);
+	                r.setId_reparacion(id);
+
+	                lista.add(r);
 	            }
-
-	            int id = rs.getInt("id_reparacion");
-	            String descripcion = rs.getString("descripcion");
-	            Date fechaEntrada = rs.getDate("fecha_entrada");
-	            double costeEstimado = rs.getDouble("coste_estimado");
-	            String estado = rs.getString("estado");
-	            int vehiculoId = rs.getInt("vehiculo_id");
-	            int usuarioId = rs.getInt("usuario_id");
-
-	            Reparacion r = new Reparacion(descripcion, fechaEntrada, costeEstimado, estado, vehiculoId, usuarioId);
-	            r.setId_reparacion(id);
-	            
-	            return r;
 	        }
 
+	        if (lista.isEmpty()) {
+	            System.out.println("> No hay reparaciones para matrícula: " + matricula);
+	        }
+
+	        return lista;
+
 	    } catch (SQLException e) {
-	        System.out.println("> NOK: Error al buscar reparación por matrícula.");
+	        System.out.println("> NOK: Error al buscar reparaciones por matrícula.");
 	        System.out.println("> Detalles: " + e.getMessage());
 	        return null;
 	    }
+	}
+
+
+
+	public ArrayList<Reparacion> findFinalizadas() {
+		ArrayList<Reparacion> reparaciones = findAll();
+		ArrayList<Reparacion> finalizadas = new ArrayList<>(); 
+		for (Reparacion reparacion : reparaciones) {
+			if(reparacion.getEstado().equalsIgnoreCase("FINALIZADO")) {
+				finalizadas.add(reparacion);
+			}
+		}
+		return finalizadas;
+	}
+
+
+	public int countFinalizadas() {
+		ArrayList<Reparacion> finalizadas = findFinalizadas(); 
+		return finalizadas.size();
+	}
+
+
+	public Reparacion findById(int id) {
+		try {
+			String sqlDelete = "SELECT * FROM reparacion WHERE matricula= ?;";
+			PreparedStatement pst = conexion.prepareStatement(sqlDelete);
+
+			pst.setInt(1, id); 
+			
+			 try (ResultSet rs = pst.executeQuery()) {
+		            if (!rs.next()) {
+		                System.out.println("> Reparación no encontrada para id: " + id);
+		                return null;
+		            }
+
+		            String descripcion = rs.getString("descripcion");
+		            Date fechaEntrada = rs.getDate("fecha_entrada");
+		            double costeEstimado = rs.getDouble("coste_estimado");
+		            String estado = rs.getString("estado");
+		            int vehiculoId = rs.getInt("vehiculo_id");
+		            int usuarioId = rs.getInt("usuario_id");
+
+		            Reparacion r = new Reparacion(descripcion, fechaEntrada, costeEstimado, estado, vehiculoId, usuarioId);
+		            r.setId_reparacion(id);
+		            
+		            return r;
+		        }
+			
+			
+
+		} catch (SQLException e) {
+			System.out.println("> NOK:" + e.getMessage());
+			return null;
+		}
 	}
 
 }

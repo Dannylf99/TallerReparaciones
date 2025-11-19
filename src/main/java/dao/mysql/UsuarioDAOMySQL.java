@@ -222,6 +222,11 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 		
 	}
 
+	public Usuario findUsuarioLogueado(String dni) {
+		
+		return null;
+	}
+
 
 
 }

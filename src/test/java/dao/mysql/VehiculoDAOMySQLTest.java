@@ -18,7 +18,7 @@ class VehiculoDAOMySQLTest {
 		        VehiculoDAOMySQL vehiculoDAO = (VehiculoDAOMySQL) factory.getVehiculoDAO();
 
 
-		        Vehiculo v1 = new Vehiculo("1235ABC", "Toyota", 20); // cliente_id = 1 (existente)
+		        Vehiculo v1 = new Vehiculo("1235ABC", "Toyota","Ibiza", 20); // cliente_id = 1 (existente)
 		        vehiculoDAO.insert(v1);
 		        System.out.println("Vehículo creado: " + v1.getMatricula() + "  ID asignado --> " + v1.getId_vehiculo());
 

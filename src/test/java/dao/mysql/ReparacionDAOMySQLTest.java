@@ -28,7 +28,7 @@ class ReparacionDAOMySQLTest {
 	        System.out.println(usuariosId);
 			
 	        
-	        Vehiculo v = new Vehiculo("1234PIP", "Toyota", 1); 
+	        Vehiculo v = new Vehiculo("1234PIP", "Toyota", "Corolla", 1); 
 	        cochesDAO.insert(v);
 	        int vehiculoId = v.getId_vehiculo();
 	        System.out.println(vehiculoId);
@@ -51,9 +51,9 @@ class ReparacionDAOMySQLTest {
 	        int updateResult = reparacionDAO.update(r1);
 	        assertEquals(0, updateResult);
 	       
-
-	        Reparacion r2 = reparacionDAO.findByMatricula("1234PIP");
-	        int nVehiculo = r2.getVehiculo_id();
+	        //Arreglar
+	        ArrayList<Reparacion> listaReparacionesVehiculo  = reparacionDAO.findByMatricula("1234PIP");
+	        int nVehiculo =  listaReparaciones[0].getVehiculo_id();
 	        if (r2 != null) {
 	            assertEquals("1234PIP", r2.getVehiculo_id() == nVehiculo ? "1234PIP" : "");
 	        }

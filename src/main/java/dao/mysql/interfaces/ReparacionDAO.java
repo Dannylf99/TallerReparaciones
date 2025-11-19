@@ -14,5 +14,5 @@ public interface ReparacionDAO {
 
 	ArrayList<Reparacion> findAll();
 
-	Reparacion findByMatricula(String matricula);
+	ArrayList<Reparacion> findByMatricula(String matricula);
 }

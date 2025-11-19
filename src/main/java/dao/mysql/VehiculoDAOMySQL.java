@@ -26,12 +26,13 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 	public int insert(Vehiculo v) {
 		int rc = 0;
 		try {
-			String sql = "INSERT INTO vehiculo(matricula, marca, cliente_id) VALUES(?, ?, ?)";
+			String sql = "INSERT INTO vehiculo(matricula, marca, modelo, cliente_id) VALUES(?, ?, ?, ?)";
 			PreparedStatement pst = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
 			pst.setString(1, v.getMatricula()); // Posicion 1, valor matricula
 			pst.setString(2, v.getMarca()); // Posición 2, valor marca
-			pst.setInt(3, v.getCliente_id()); // Posición 3, valor cliente_id
+			pst.setString(3, v.getModelo()); // Posicion 3, valor modelo
+			pst.setInt(4, v.getCliente_id()); // Posición 4, valor cliente_id
 
 			int resul = pst.executeUpdate();
 			if (resul > 0) {
@@ -63,10 +64,11 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 		
 		String matricula = v.getMatricula();
 		String marca = v.getMarca();
+		String modelo = v.getModelo();
 		int id_cliente= v.getCliente_id();
 		int id = v.getId_vehiculo();
 		
-		String sqlUpdate = "UPDATE vehiculo SET matricula= '" + matricula + "', marca= '" + marca + "', cliente_id= '" + id_cliente + "' WHERE id_vehiculo = " + id + ";";
+		String sqlUpdate = "UPDATE vehiculo SET matricula= '" + matricula + "', marca= '" + marca + "', modelo = '" + modelo + "', cliente_id= '" + id_cliente + "' WHERE id_vehiculo = " + id + ";";
 		
 		try {
 			PreparedStatement pst = conexion.prepareStatement(sqlUpdate);
@@ -130,9 +132,11 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 				
 				String marca = resultado.getString("marca");
 				
+				String modelo = resultado.getString("modelo");
+				
 				int idCliente = resultado.getInt("cliente_id");
 				
-				Vehiculo v = new Vehiculo(matricula,marca,idCliente);
+				Vehiculo v = new Vehiculo(matricula,marca,modelo,idCliente);
 				v.setId_vehiculo(id);
 				
 				vehiculos.add(v);
@@ -163,9 +167,10 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 
 	            int id = rs.getInt("id_vehiculo");
 	            String marca = rs.getString("marca");
+	            String modelo = rs.getString("modelo");
 	            int idCliente = rs.getInt("cliente_id");
 
-	            Vehiculo v = new Vehiculo(matricula, marca, idCliente);
+	            Vehiculo v = new Vehiculo(matricula, marca, modelo, idCliente);
 	            v.setId_vehiculo(id);
 
 	            return v;
