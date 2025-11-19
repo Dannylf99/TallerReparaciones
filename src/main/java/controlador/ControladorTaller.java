@@ -16,6 +16,7 @@ import entities.Vehiculo;
 public class ControladorTaller {
 
     private static ControladorTaller instance;
+    Scanner sc = new Scanner(System.in);
 
     public static ControladorTaller getInstance() {
         return instance;
@@ -106,7 +107,6 @@ public class ControladorTaller {
         }
 
         System.out.println("> Seleccione el id:");
-        Scanner sc = new Scanner(System.in);
         int id = sc.nextInt();
         sc.nextLine(); // limpiar buffer
 
@@ -132,28 +132,281 @@ public class ControladorTaller {
 
 
     public void altaCliente() {
-        System.out.println("Alta de cliente no implementada en este snippet.");
+        String nombre;
+        do {
+            System.out.print("> Introduce el nombre: ");
+            nombre = sc.nextLine().trim();
+            if (nombre.isEmpty()) System.out.println("> El nombre no puede estar vacío.");
+        } while (nombre.isEmpty());
+
+        String dni;
+        do {
+            System.out.print("> Introduce el dni: ");
+            dni = sc.nextLine().trim();
+            if (dni.isEmpty()) System.out.println("> El DNI no puede estar vacío.");
+        } while (dni.isEmpty());
+
+        String email;
+        do {
+            System.out.print("> Introduce el email: ");
+            email = sc.nextLine().trim();
+            if (email.isEmpty()) System.out.println("> El email no puede estar vacío.");
+        } while (email.isEmpty());
+
+        int tel = 0;
+        boolean valido = false;
+        while (!valido) {
+            System.out.print("> Introduce el teléfono: ");
+            String telInput = sc.nextLine().trim();
+            try {
+                tel = Integer.parseInt(telInput);
+                valido = true;
+            } catch (NumberFormatException e) {
+                System.out.println("> Teléfono no válido, introduce solo números.");
+            }
+        }
+
+        Cliente c = new Cliente(nombre, dni, email, tel);
+        clienteDAO.insert(c);
+        System.out.println("> Cliente dado de alta correctamente.");
     }
 
+
     public void bajaCliente() {
-        System.out.println("Baja de cliente no implementada en este snippet.");
+        System.out.println("> Introduce el dni para dar de baja: ");
+        String dni = sc.nextLine();
+        clienteDAO.delete(dni);
     }
 
     public void modificarCliente() {
-        System.out.println("Modificar cliente no implementado en este snippet.");
+        System.out.print("> Introduce el DNI del cliente que quieras modificar: ");
+        String dni = sc.nextLine();
+
+        Cliente c = clienteDAO.findByDni(dni);
+        if (c == null) {
+            System.out.println("> Cliente no encontrado.");
+            return;
+        }
+
+        boolean continuar = true;
+        while (continuar) {
+            System.out.println("\n> Datos actuales del cliente:");
+            System.out.println("1. Nombre: " + c.getNombre());
+            System.out.println("2. DNI: " + c.getDni());
+            System.out.println("3. Email: " + c.getEmail());
+            System.out.println("4. Teléfono: " + c.getTelefono());
+            System.out.println("0. Terminar y guardar cambios");
+            System.out.print("> Selecciona el campo a modificar: ");
+
+            String input = sc.nextLine();
+            int opcion;
+            try {
+                opcion = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("> Opción no válida");
+                continue;
+            }
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("> Nuevo nombre: ");
+                    c.setNombre(sc.nextLine());
+                    break;
+                case 2:
+                    System.out.print("> Nuevo DNI: ");
+                    c.setDni(sc.nextLine());
+                    break;
+                case 3:
+                    System.out.print("> Nuevo email: ");
+                    c.setEmail(sc.nextLine());
+                    break;
+                case 4:
+                    System.out.print("> Nuevo teléfono: ");
+                    try {
+                        c.setTelefono(Integer.parseInt(sc.nextLine()));
+                    } catch (NumberFormatException e) {
+                        System.out.println("> Teléfono no válido");
+                    }
+                    break;
+                case 0:
+                    continuar = false;
+                    break;
+                default:
+                    System.out.println("> Opción no válida");
+            }
+        }
+
+        clienteDAO.update(c);
+        System.out.println("> Cliente actualizado correctamente.");
     }
 
+
     public void altaVehiculo() {
-        System.out.println("Alta de vehículo no implementada.");
+        // Matrícula
+        String matricula;
+        do {
+            System.out.print("> Introduce la matrícula: ");
+            matricula = sc.nextLine().trim();
+            if (matricula.isEmpty()) System.out.println("> La matrícula no puede estar vacía.");
+        } while (matricula.isEmpty());
+
+        // Marca
+        String marca;
+        do {
+            System.out.print("> Introduce la marca: ");
+            marca = sc.nextLine().trim();
+            if (marca.isEmpty()) System.out.println("> La marca no puede estar vacía.");
+        } while (marca.isEmpty());
+
+        // Modelo
+        String modelo;
+        do {
+            System.out.print("> Introduce el modelo: ");
+            modelo = sc.nextLine().trim();
+            if (modelo.isEmpty()) System.out.println("> El modelo no puede estar vacío.");
+        } while (modelo.isEmpty());
+
+        // DNI del cliente
+        String dni;
+        Cliente cliente = null;
+        do {
+            System.out.print("> Introduce el DNI del cliente: ");
+            dni = sc.nextLine().trim();
+            if (dni.isEmpty()) {
+                System.out.println("> El DNI no puede estar vacío.");
+                continue;
+            }
+            // Se le busca por el dni
+            cliente = clienteDAO.findByDni(dni);
+            if (cliente == null) {
+                System.out.println("> Cliente no encontrado, introduce un DNI válido.");
+            }
+        } while (cliente == null); //Hasta que el cliente no esté bien no se sale.
+
+        // Creamos el vehículo y lo asociamos al cliente
+        Vehiculo v = new Vehiculo(matricula, marca, modelo, cliente.getId_Cliente());
+        vehiculoDAO.insert(v);
+        //Se avisa al usuario de que se ha incluido.
+        System.out.println("> Vehículo dado de alta correctamente y asociado al cliente " + cliente.getNombre());
     }
 
     public void bajaVehiculo() {
-        System.out.println("Baja de vehículo no implementada.");
+        String matricula;
+
+        do {
+            System.out.print("> Introduce la matrícula del vehículo que deseas dar de baja: ");
+            matricula = sc.nextLine().trim();
+
+            if (matricula.isEmpty()) {
+                System.out.println("> La matrícula no puede estar vacía.");
+            }
+        } while (matricula.isEmpty());
+
+        // Verificar que el vehículo exista antes de borrarlo
+        Vehiculo v = vehiculoDAO.findByMatricula(matricula);
+        if (v == null) {
+            System.out.println("> No existe ningún vehículo con esa matrícula.");
+            return;
+        }
+
+        vehiculoDAO.delete(matricula);
+        System.out.println("> Vehículo dado de baja correctamente.");
     }
 
+
     public void modificarVehiculo() {
-        System.out.println("Modificar vehículo no implementado.");
+        System.out.print("> Introduce la matrícula del vehículo que quieras modificar: ");
+        String matricula = sc.nextLine();
+
+        Vehiculo v = vehiculoDAO.findByMatricula(matricula);
+        if (v == null) {
+            System.out.println("> Vehículo no encontrado.");
+            return;
+        }
+
+        boolean continuar = true;
+
+        while (continuar) {
+            System.out.println("\n> Datos actuales del vehículo:");
+            System.out.println("1. Matrícula: " + v.getMatricula());
+            System.out.println("2. Marca: " + v.getMarca());
+            System.out.println("3. Modelo: " + v.getModelo());
+            System.out.println("4. DNI del dueño actual: " + clienteDAO.findById(v.getId_Cliente()).getDni());
+            System.out.println("0. Terminar y guardar cambios");
+            System.out.print("> Selecciona el campo a modificar: ");
+
+            String input = sc.nextLine();
+            int opcion;
+
+            try {
+                opcion = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("> Opción no válida");
+                continue;
+            }
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("> Nueva matrícula: ");
+                    String nuevaMatricula = sc.nextLine().trim();
+                    if (!nuevaMatricula.isEmpty()) {
+                        v.setMatricula(nuevaMatricula);
+                    } else {
+                        System.out.println("> La matrícula no puede estar vacía.");
+                    }
+                    break;
+
+                case 2:
+                    System.out.print("> Nueva marca: ");
+                    String nuevaMarca = sc.nextLine().trim();
+                    if (!nuevaMarca.isEmpty()) {
+                        v.setMarca(nuevaMarca);
+                    } else {
+                        System.out.println("> La marca no puede estar vacía.");
+                    }
+                    break;
+
+                case 3:
+                    System.out.print("> Nuevo modelo: ");
+                    String nuevoModelo = sc.nextLine().trim();
+                    if (!nuevoModelo.isEmpty()) {
+                        v.setModelo(nuevoModelo);
+                    } else {
+                        System.out.println("> El modelo no puede estar vacío.");
+                    }
+                    break;
+
+                case 4:
+                    System.out.print("> Nuevo DNI del dueño: ");
+                    String dniNuevo = sc.nextLine().trim();
+
+                    if (dniNuevo.isEmpty()) {
+                        System.out.println("> El DNI no puede estar vacío.");
+                        break;
+                    }
+
+                    Cliente nuevoCliente = clienteDAO.findByDni(dniNuevo);
+                    if (nuevoCliente == null) {
+                        System.out.println("> Cliente no encontrado. No se cambia el dueño.");
+                    } else {
+                        v.setCliente_id(nuevoCliente.getId_Cliente());
+                        System.out.println("> Dueño actualizado correctamente.");
+                    }
+                    break;
+
+                case 0:
+                    continuar = false;
+                    break;
+
+                default:
+                    System.out.println("> Opción no válida");
+            }
+        }
+
+        vehiculoDAO.update(v);
+        System.out.println("> Vehículo actualizado correctamente.");
     }
+
 
     public void mostrarEstadisticas() {
         int total = reparacionDAO.findAll().size();

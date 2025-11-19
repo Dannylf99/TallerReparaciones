@@ -36,7 +36,6 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 
 			int resul = pst.executeUpdate();
 			if (resul > 0) {
-				System.out.println("> OK. Vehículo insertado correctamente.");
 			} else {
 				System.out.println("> NOK. Vehículo no insertado.");
 				return -1;
@@ -46,7 +45,6 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 	            if (generatedKeys.next()) {
 	                int id = generatedKeys.getInt(1);
 	                v.setId_vehiculo(id);
-	                System.out.println("> ID del vehículo: " + id);
 	            } else {
 	                System.out.println("> WARNING: No se pudo recuperar el ID del vehículo.");
 	            }

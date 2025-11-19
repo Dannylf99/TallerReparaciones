@@ -99,9 +99,9 @@ public class ClienteDAOMySQL implements ClienteDAO {
 			int resul = pst.executeUpdate();
 			
 			if (resul > 0) {
-				System.out.println("> OK. Persona con dni" + dni + "eliminada correctamente.");
+				System.out.println("> OK. Cliente con dni" + dni + "eliminada correctamente.");
 			} else {
-				System.out.println("> NOK. Persona no encontrada.");
+				System.out.println("> NOK. Cliente no encontrado.");
 				return -1;
 			}
 
