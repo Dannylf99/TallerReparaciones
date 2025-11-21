@@ -244,4 +244,100 @@ public class ReparacionDAOMySQL implements ReparacionDAO {
 		}
 	}
 
+
+	public double filtrarPorCosteMedio(int opcion) {
+		
+		if (opcion == 0) {
+		try {
+			double media = 0;
+			String sqlCoste = "SELECT AVG(coste_estimado) AS media FROM reparacion;";
+			PreparedStatement pst = conexion.prepareStatement(sqlCoste);
+
+			ResultSet rs = pst.executeQuery();
+
+			
+			if (rs.next()) {
+			    media = rs.getDouble("media");
+			}
+		        
+			media = Math.round(media * 100.0) / 100.0;
+		    return media;
+		        	
+
+		} catch (SQLException e) {
+			System.out.println("> NOK:" + e.getMessage());
+			return -1;
+		}
+		} else if(opcion == 1){
+			try {
+				double media = 0;
+				String sqlCoste = "SELECT AVG(coste_estimado) AS media FROM reparacion WHERE estado = 'EN PREPARACIÓN';";
+				PreparedStatement pst = conexion.prepareStatement(sqlCoste);
+
+				ResultSet rs = pst.executeQuery();
+
+				
+				if (rs.next()) {
+				    media = rs.getDouble("media");
+				}
+			         
+				media = Math.round(media * 100.0) / 100.0;
+			    return media;
+			        	
+
+			} catch (SQLException e) {
+				System.out.println("> NOK:" + e.getMessage());
+				return -1;
+			}
+
+		} else if(opcion == 2) {
+			try {
+				double media = 0;
+				String sqlCoste = "SELECT AVG(coste_estimado) AS media FROM reparacion WHERE estado = 'EN REPARACIÓN';";
+				PreparedStatement pst = conexion.prepareStatement(sqlCoste);
+
+				ResultSet rs = pst.executeQuery();
+
+				
+				if (rs.next()) {
+				    media = rs.getDouble("media");
+				}
+			    
+				media = Math.round(media * 100.0) / 100.0;
+			    return media;
+			        	
+
+			} catch (SQLException e) {
+				System.out.println("> NOK:" + e.getMessage());
+				return -1;
+			}
+			
+		} else if(opcion == 3) {
+			try {
+				double media = 0;
+				String sqlCoste = "SELECT AVG(coste_estimado) AS media FROM reparacion WHERE estado = 'FINALIZADO';";
+				PreparedStatement pst = conexion.prepareStatement(sqlCoste);
+
+				ResultSet rs = pst.executeQuery();
+
+				
+				if (rs.next()) {
+				    media = rs.getDouble("media");
+				}
+			     
+				media = Math.round(media * 100.0) / 100.0;
+			    return media;
+			        	
+
+			} catch (SQLException e) {
+				System.out.println("> NOK:" + e.getMessage());
+				return -1;
+			} 
+		} else {
+			System.out.println("> Opción incorrecta.");
+			return -1;
+		}
+		
+	}
+	
 }

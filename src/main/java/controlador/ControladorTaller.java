@@ -48,16 +48,8 @@ public class ControladorTaller {
             return;
         }
         
-        int n = 1;
         for (Reparacion r : lista) {
-        	System.out.println(n + ". ID: " + r.getId_reparacion() 
-            + ", Descripción: " + r.getDescripcion()
-            + ", Fecha de entrada: " + r.getFecha_entrada()
-            + ", Coste estimado: " + r.getCoste_estimado()
-            + ", Estado: " + r.getEstado()
-            + ", Vehículo ID: " + r.getVehiculo_id()
-            + ", Usuario ID: " + r.getUsuario_id());
-            n++;
+        	System.out.println(r.toString());
         }
     }
 
@@ -331,7 +323,7 @@ public class ControladorTaller {
             System.out.println("1. Matrícula: " + v.getMatricula());
             System.out.println("2. Marca: " + v.getMarca());
             System.out.println("3. Modelo: " + v.getModelo());
-            System.out.println("4. DNI del dueño actual: " + clienteDAO.findById(v.getId_Cliente()).getDni());
+            //System.out.println("4. DNI del dueño actual: " + clienteDAO.findById(v.getId_Cliente()).getDni());
             System.out.println("0. Terminar y guardar cambios");
             System.out.print("> Selecciona el campo a modificar: ");
 
@@ -399,7 +391,7 @@ public class ControladorTaller {
                     break;
 
                 default:
-                    System.out.println("> Opción no válida");
+                    System.out.println("> Opción no válida.");
             }
         }
 
@@ -409,10 +401,90 @@ public class ControladorTaller {
 
 
     public void mostrarEstadisticas() {
-        int total = reparacionDAO.findAll().size();
-        int finalizadas = reparacionDAO.countFinalizadas();
+        System.out.println("\n===== ESTADÍSTICAS DE REPARACIONES =====");
+        System.out.println("1. Filtrar por estado");
+        System.out.println("2. Filtrar por coste medio");
+        System.out.println("0. Salir");
+        System.out.print("> Seleccione una opción: ");
 
-        System.out.println("Total reparaciones: " + total);
-        System.out.println("Finalizadas: " + finalizadas);
+        int opcion;
+        try {
+            opcion = Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("> Opción no válida.");
+            return;
+        }
+
+        switch (opcion) {
+            case 1:
+                ArrayList<Reparacion> reparaciones = reparacionDAO.findAll();
+
+                ArrayList<Reparacion> enPreparacion = new ArrayList<>();
+                ArrayList<Reparacion> enReparacion = new ArrayList<>();
+                ArrayList<Reparacion> finalizado = new ArrayList<>();
+
+                for (Reparacion r : reparaciones) {
+                    String estado = r.getEstado().toUpperCase();
+
+                    switch (estado) {
+                        case "EN PREPARACIÓN":
+                            enPreparacion.add(r);
+                            break;
+
+                        case "EN REPARACIÓN":
+                            enReparacion.add(r);
+                            break;
+
+                        case "FINALIZADO":
+                            finalizado.add(r);
+                            break;
+
+                        default:
+                            System.out.println("> Fallo en el estado de la reparación con ID: " + r.getId_reparacion());
+                    }
+                }
+
+                double costePreparacion = reparacionDAO.filtrarPorCosteMedio(1);
+                double costeReparacion = reparacionDAO.filtrarPorCosteMedio(2);
+                double costeFinalizado = reparacionDAO.filtrarPorCosteMedio(3);
+
+                System.out.println("\n--- REPARACIONES POR ESTADO ---");
+
+                System.out.println("\nEN PREPARACIÓN (" + enPreparacion.size() + "), Coste medio: " + costePreparacion + "€:");
+                for (Reparacion r : enPreparacion) {
+                    System.out.println(r);
+                }
+
+                System.out.println("\nEN REPARACIÓN (" + enReparacion.size() + "), Coste medio: " + costeReparacion + "€:");
+                for (Reparacion r : enReparacion) {
+                    System.out.println(r);
+                }
+
+                System.out.println("\nFINALIZADO (" + finalizado.size() + "), Coste medio: " + costeFinalizado + "€:");
+                for (Reparacion r : finalizado) {
+                    System.out.println(r);
+                }
+                break;
+
+            case 2:
+                double costeMedio = reparacionDAO.filtrarPorCosteMedio(0);
+                double costeUno = reparacionDAO.filtrarPorCosteMedio(1);
+                double costeDos = reparacionDAO.filtrarPorCosteMedio(2);
+                double costeTres = reparacionDAO.filtrarPorCosteMedio(3);
+
+                System.out.println("> Coste medio general: " + costeMedio + "€");
+                System.out.println("> Coste medio (EN PREPARACIÓN): " + costeUno + "€");
+                System.out.println("> Coste medio (EN REPARACIÓN): " + costeDos + "€");
+                System.out.println("> Coste medio (FINALIZADO): " + costeTres + "€");
+                break;
+
+            case 0:
+                return;
+
+            default:
+                System.out.println("> Opción no válida.");
+        }
     }
+
+    
 }

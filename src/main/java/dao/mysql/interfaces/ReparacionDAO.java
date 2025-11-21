@@ -15,4 +15,6 @@ public interface ReparacionDAO {
 	ArrayList<Reparacion> findAll();
 
 	ArrayList<Reparacion> findByMatricula(String matricula);
+	
+	double filtrarPorCosteMedio(int opcion);
 }

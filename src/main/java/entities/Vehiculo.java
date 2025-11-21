@@ -55,4 +55,15 @@ public class Vehiculo {
 		this.cliente_id = cliente_id;
 	}
 
+	@Override
+	public String toString() {
+	    return "Vehiculo{" +
+	            "id_vehiculo=" + id_vehiculo +
+	            ", matricula='" + matricula + '\'' +
+	            ", marca='" + marca + '\'' +
+	            ", modelo='" + modelo + '\'' +
+	            ", cliente_id=" + cliente_id +
+	            '}';
+	}
+
 }

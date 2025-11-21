@@ -78,4 +78,14 @@ public class Reparacion {
 		this.usuario_id = usuario_id;
 	}
 
+	@Override
+	public String toString() {
+	    return "Reparacion id=" + id_reparacion +
+	           ", descripcion='" + descripcion + '\'' +
+	           ", fechaEntrada=" + fecha_entrada +
+	           ", costeEstimado=" + coste_estimado +
+	           ", estado='" + estado + '\'' +
+	           ", vehiculoId=" + vehiculo_id +
+	           ", usuarioId=" + usuario_id + '}';
+	}
 }
