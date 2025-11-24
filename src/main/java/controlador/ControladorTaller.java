@@ -163,8 +163,12 @@ public class ControladorTaller {
         }
 
         Cliente c = new Cliente(nombre, dni, email, tel);
-        clienteDAO.insert(c);
-        System.out.println("> Cliente dado de alta correctamente.");
+        int resultado = (clienteDAO.insert(c));
+        if (resultado == -1) {
+        	System.out.println("> No se ha introducido el cliente por el fallo que se indica.");
+        } else {
+        	System.out.println("> Cliente dado de alta correctamente.");
+        }
     }
 
 
@@ -281,9 +285,13 @@ public class ControladorTaller {
 
         // Creamos el vehículo y lo asociamos al cliente
         Vehiculo v = new Vehiculo(matricula, marca, modelo, cliente.getId_Cliente());
-        vehiculoDAO.insert(v);
+        int resultado = vehiculoDAO.insert(v);
         //Se avisa al usuario de que se ha incluido.
-        System.out.println("> Vehículo dado de alta correctamente y asociado al cliente " + cliente.getNombre());
+        if (resultado == -1) {
+        	System.out.println("> No se ha introducido el vehículo por el fallo que se indica.");
+        } else {
+        	System.out.println("> Vehículo dado de alta correctamente y asociado al cliente " + cliente.getNombre());
+        }
     }
 
     public void bajaVehiculo() {

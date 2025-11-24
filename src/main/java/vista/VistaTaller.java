@@ -208,7 +208,7 @@ public class VistaTaller {
             System.out.println("2. Gestionar vehículos");
             System.out.println("3. Registrar reparación");
             System.out.println("4. Cambiar estado de reparación");
-            System.out.println("5. Ver estadísticas");
+            System.out.println("5. Consultar estadísticas");
             System.out.println("0. Cerrar sesión");
 
             opcion = sc.nextInt();
@@ -232,7 +232,7 @@ public class VistaTaller {
                 cambiarEstadoReparacion();
                 break;
 
-            case 6:
+            case 5:
                 controlador.mostrarEstadisticas();
                 break;
 
