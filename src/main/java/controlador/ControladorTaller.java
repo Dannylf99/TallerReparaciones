@@ -54,32 +54,36 @@ public class ControladorTaller {
     }
 
     public Usuario login(String dni, String pass) {
+    	//Se comprueba que la contraseña es correcta en base al usuario.
         boolean ok = usuarioDAO.login(dni, pass);
         if (!ok) return null;
 
+        //Se devuelve que el usuario se ha logueado.
         return usuarioDAO.findByDni(dni);
     }
 
     public void registrarReparacion(String matricula, String desc, double coste, String fecha, String dni) {
+    	//El busca el vehículo en base a la matrícula
         Vehiculo v = vehiculoDAO.findByMatricula(matricula);
-
+        //Si no se encuentra, se devuelve
         if (v == null) {
             System.out.println("Vehículo no encontrado");
             return;
         }
-
+        //Lo mismo con el usuario
         Usuario u = usuarioDAO.findByDni(dni);
         if (u == null) {
             System.out.println("Error: no hay usuario logueado.");
             return;
         }
-
-        Reparacion r = new Reparacion(desc, Date.valueOf(fecha), coste, "EN REPARACIÓN",
+        //Se crea una reparación, con el valor por defecto de "EN PREPARACIÓN"
+        Reparacion r = new Reparacion(desc, Date.valueOf(fecha), coste, "EN PREPARACIÓN",
                 v.getId_vehiculo(), u.getId_usuario());
-
+        //Se inserta y se avisa al cliente
         reparacionDAO.insert(r);
         System.out.println("Reparación registrada.");
     }
+
 
     public void cambiarEstado(String matricula, String estado) {
         ArrayList<Reparacion> lista = reparacionDAO.findByMatricula(matricula);
@@ -315,6 +319,8 @@ public class ControladorTaller {
             System.out.println("> Vehículo no encontrado.");
             return;
         }
+        
+        Cliente c = clienteDAO.findById(v.getCliente_id());
 
         boolean continuar = true;
 
@@ -323,7 +329,7 @@ public class ControladorTaller {
             System.out.println("1. Matrícula: " + v.getMatricula());
             System.out.println("2. Marca: " + v.getMarca());
             System.out.println("3. Modelo: " + v.getModelo());
-            //System.out.println("4. DNI del dueño actual: " + clienteDAO.findById(v.getId_Cliente()).getDni());
+            System.out.println("4. DNI del dueño actual: " + c.getDni());
             System.out.println("0. Terminar y guardar cambios");
             System.out.print("> Selecciona el campo a modificar: ");
 
@@ -369,7 +375,7 @@ public class ControladorTaller {
                     break;
 
                 case 4:
-                    System.out.print("> Nuevo DNI del dueño: ");
+                    System.out.print("> DNI del nuevo dueño: ");
                     String dniNuevo = sc.nextLine().trim();
 
                     if (dniNuevo.isEmpty()) {
@@ -379,7 +385,7 @@ public class ControladorTaller {
 
                     Cliente nuevoCliente = clienteDAO.findByDni(dniNuevo);
                     if (nuevoCliente == null) {
-                        System.out.println("> Cliente no encontrado. No se cambia el dueño.");
+                        System.out.println("> Cliente no encontrado.");
                     } else {
                         v.setCliente_id(nuevoCliente.getId_Cliente());
                         System.out.println("> Dueño actualizado correctamente.");
@@ -391,13 +397,14 @@ public class ControladorTaller {
                     break;
 
                 default:
-                    System.out.println("> Opción no válida.");
+                    System.out.println("> Opción no válida");
             }
         }
 
         vehiculoDAO.update(v);
         System.out.println("> Vehículo actualizado correctamente.");
     }
+
 
 
     public void mostrarEstadisticas() {

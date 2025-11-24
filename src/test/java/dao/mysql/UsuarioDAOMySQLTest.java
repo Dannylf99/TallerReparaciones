@@ -34,6 +34,8 @@ class UsuarioDAOMySQLTest {
 		usuario.delete("22222223C");
 
 		ArrayList<Usuario> usuariosPrint = usuario.findAll();
+	
+		usuariosPrint.toString();
 
 
 		assertFalse(usuario.login("23243434Q", "petaka"));

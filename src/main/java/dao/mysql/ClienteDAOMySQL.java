@@ -181,4 +181,35 @@ public class ClienteDAOMySQL implements ClienteDAO {
 		}
 	}
 
+	@Override
+	public Cliente findById(int id) {
+
+		String sql = "SELECT * FROM cliente WHERE id_cliente = ?";
+
+	    try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+	        pst.setInt(1, id);
+	        ResultSet rs = pst.executeQuery();
+
+	        if (!rs.next()) {
+	            return null;
+	        }
+
+	        Cliente c = new Cliente(
+	            rs.getString("nombre"),
+	            rs.getString("dni"),
+	            rs.getString("email"),
+	            rs.getInt("telefono")
+	        );
+	        c.setId_Cliente(id);
+
+	        return c;
+
+	    } catch (SQLException e) {
+	        System.out.println("> ERROR: " + e.getMessage());
+	        return null;
+	    }
+		
+	}
+
+
 }

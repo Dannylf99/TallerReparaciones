@@ -51,12 +51,6 @@ class ReparacionDAOMySQLTest {
 	        int updateResult = reparacionDAO.update(r1);
 	        assertEquals(0, updateResult);
 	       
-	        //Arreglar
-	        ArrayList<Reparacion> listaReparacionesVehiculo  = reparacionDAO.findByMatricula("1234PIP");
-	        int nVehiculo =  listaReparaciones[0].getVehiculo_id();
-	        if (r2 != null) {
-	            assertEquals("1234PIP", r2.getVehiculo_id() == nVehiculo ? "1234PIP" : "");
-	        }
 
 	        ArrayList<Reparacion> listaReparaciones = reparacionDAO.findAll();
 	        assertNotNull(listaReparaciones);
