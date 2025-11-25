@@ -28,13 +28,13 @@ public class VistaTaller {
             System.out.println("1. Ver reparaciones finalizadas");
             System.out.println("2. Iniciar sesión");
             System.out.println("0. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.print("> Seleccione una opción: ");
 
             String input = sc.nextLine();
             try {
                 opcion = Integer.parseInt(input);
             } catch (NumberFormatException e) {
-                System.out.println("Opción no válida");
+                System.out.println("> Opción no válida");
                 opcion = -1;
                 continue;
             }
@@ -50,11 +50,11 @@ public class VistaTaller {
                 break;
 
             case 0:
-                System.out.println("Saliendo...");
+                System.out.println("> Saliendo...");
                 break;
 
             default:
-                System.out.println("Opción no válida");
+                System.out.println("> Opción no válida");
             }
         }
     }
@@ -65,9 +65,9 @@ public class VistaTaller {
      */
      private void login() {
      	//Se le piden las credenciales.
-         System.out.print("Usuario: ");
+         System.out.print("> Usuario: ");
          String user = sc.nextLine();
-         System.out.print("Contraseña: ");
+         System.out.print("> Contraseña: ");
          String pass = sc.nextLine();
 
          //Guardamos el usuario si cumple el login
@@ -76,11 +76,11 @@ public class VistaTaller {
          //Si no es nulo, se le imprime y se le pasa a la ventana de su menú, dependiendo del rol
          if (u != null) {
          	//Se le imprime un mensaje de bienvenida y se le manda al rol
-             System.out.println("Bienvenido " + u.getNombre_usuario());
+             System.out.println("> Bienvenido " + u.getNombre_usuario());
              menuPorRol(u);
          } else {
          	//Se indica que no ha mentido las credenciales correctas y se vuelve al menú de invitado.
-             System.out.println("Credenciales incorrectas");
+             System.out.println("> Credenciales incorrectas");
          }
      }
 
@@ -116,28 +116,36 @@ public class VistaTaller {
             System.out.println("1. Registrar nueva reparación");
             System.out.println("2. Cambiar estado de reparación");
             System.out.println("0. Cerrar sesión");
+            System.out.print("> Introduce una opción: ");
 
-            opcion = sc.nextInt();
-            sc.nextLine();
+            if (sc.hasNextInt()) {
+                opcion = sc.nextInt();
+                sc.nextLine();
+            } else {
+                System.out.println("> Error: debes introducir un número.");
+                sc.nextLine();
+                continue;
+            }
 
             switch (opcion) {
+                case 1:
+                    registrarReparacion(u);
+                    break;
 
-            case 1:
-                registrarReparacion(u);
-                break;
+                case 2:
+                    cambiarEstadoReparacion();
+                    break;
 
-            case 2:
-                cambiarEstadoReparacion();
-                break;
+                case 0:
+                    u = null;
+                    return;
 
-            case 0:
-                return;
-                
-            default:
-                System.out.println("Opción incorrecta");
+                default:
+                    System.out.println("> Opción incorrecta");
             }
         }
     }
+
     
     /**
      * Permite al mecánico registrar una nueva reparación solicitando datos
@@ -152,42 +160,61 @@ public class VistaTaller {
         System.out.print("Descripción: ");
         String descripcion = sc.nextLine();
 
-        System.out.print("Coste estimado: ");
-        double coste = sc.nextDouble();
-        sc.nextLine();
+        double coste = 0;
+        boolean valido = false;
+
+        while (!valido) {
+            System.out.print("Coste estimado: ");
+            if (sc.hasNextDouble()) {
+                coste = sc.nextDouble();
+                sc.nextLine(); // limpiar salto
+                valido = true;
+            } else {
+                System.out.println("> Error: debes introducir un número válido.");
+                sc.nextLine();
+            }
+        }
 
         System.out.print("Fecha (AAAA-MM-DD): ");
         String fecha = sc.nextLine();
-        
+
         String dni = u.getDni();
 
         controlador.registrarReparacion(matricula, descripcion, coste, fecha, dni);
     }
+
 
     /**
      * Permite cambiar el estado de una reparación seleccionada por matrícula.
      * Solicita el nuevo estado y delega el cambio al controlador.
      */
      
-     private void cambiarEstadoReparacion() {
-     	//Se indica la matrícula a la que pertenece.
+    private void cambiarEstadoReparacion() {
         System.out.print("Matricula: ");
         String id = sc.nextLine();
         String estado = "";
         boolean correcto = false;
 
-        while(!correcto) {
+        while (!correcto) {
             System.out.println("> Nuevo estado:");
             System.out.println("1. En reparación");
             System.out.println("2. Finalizada");
             System.out.print("> Introduce el estado que deseas: ");
+
+            // Validación
+            if (!sc.hasNextInt()) {
+                System.out.println("> Error: debes introducir un número.");
+                sc.nextLine();
+                continue;      
+            }
+
             int estadoNum = sc.nextInt();
             sc.nextLine(); 
 
             if (estadoNum == 1) {
                 estado = "EN REPARACIÓN";
                 correcto = true;
-            } else if(estadoNum == 2) {
+            } else if (estadoNum == 2) {
                 estado = "FINALIZADO";
                 correcto = true;
             } else {
@@ -195,117 +222,164 @@ public class VistaTaller {
             }
         }
 
-        controlador.cambiarEstado(id, estado);
+       controlador.cambiarEstado(id, estado);
     }
 
 
-    private void menuAdmin() {
-        int opcion = -1;
 
-        while (opcion != 0) {
-            System.out.println("===== MENÚ ADMINISTRADOR =====");
-            System.out.println("1. Gestionar clientes");
-            System.out.println("2. Gestionar vehículos");
-            System.out.println("3. Registrar reparación");
-            System.out.println("4. Cambiar estado de reparación");
-            System.out.println("5. Consultar estadísticas");
-            System.out.println("0. Cerrar sesión");
+     private void menuAdmin() {
+    	    int opcion = -1;
 
-            opcion = sc.nextInt();
-            sc.nextLine();
+    	    while (opcion != 0) {
+    	        System.out.println("===== MENÚ ADMINISTRADOR =====");
+    	        System.out.println("1. Gestionar clientes");
+    	        System.out.println("2. Gestionar vehículos");
+    	        System.out.println("3. Registrar reparación");
+    	        System.out.println("4. Cambiar estado de reparación");
+    	        System.out.println("5. Consultar estadísticas");
+    	        System.out.println("0. Cerrar sesión");
+    	        System.out.print("> Introduce una opción: ");
 
-            switch (opcion) {
+    	        if (sc.hasNextInt()) {
+    	            opcion = sc.nextInt();
+    	            sc.nextLine();  
+    	        } else {
+    	            System.out.println("> Error: debes introducir un número.");
+    	            sc.nextLine(); 
+    	            continue;      
+    	        }
 
-            case 1:
-                menuClientes();
-                break;
+    	        switch (opcion) {
 
-            case 2:
-                menuVehiculos();
-                break;
-                
-            case 3:
-                registrarReparacion(u);
-                break;
+    	            case 1:
+    	                menuClientes();
+    	                break;
 
-            case 4:
-                cambiarEstadoReparacion();
-                break;
+    	            case 2:
+    	                menuVehiculos();
+    	                break;
 
-            case 5:
-                controlador.mostrarEstadisticas();
-                break;
+    	            case 3:
+    	                registrarReparacion(u);
+    	                break;
 
-            case 0:
-                return;
-                
-            default:
-                System.out.println("Opción incorrecta");
-            }
+    	            case 4:
+    	                cambiarEstadoReparacion();
+    	                break;
 
-        }
-    }
+    	            case 5:
+    	                controlador.mostrarEstadisticas();
+    	                break;
+
+    	            case 0:
+    	                u = null;
+    	                return;
+
+    	            default:
+    	                System.out.println("Opción incorrecta");
+    	        }
+    	    }
+    	}
+
 
     /**
      * Muestra el menú de gestión de clientes y delega las operaciones CRUD
      * al controlador.
      */
      
-     private void menuClientes() {
-     	//Se muestran las opciones para hacer un CRUD de los clientes.
-         System.out.println("1. Alta cliente");
-         System.out.println("2. Baja cliente");
-         System.out.println("3. Modificar cliente");
-         System.out.println("0. Cerrar sesión");
+    private void menuClientes() {
+        int opcion = -1;
 
-         int opcion = sc.nextInt();
-         sc.nextLine();
+        do {
+            System.out.println("1. Alta cliente");
+            System.out.println("2. Baja cliente");
+            System.out.println("3. Modificar cliente");
+            System.out.println("0. Cerrar sesión");
+            System.out.print("> Introduce una opción: ");
 
-         switch (opcion) {
+            // Validación
+            if (sc.hasNextInt()) {
+                opcion = sc.nextInt();
+                sc.nextLine();
+            } else {
+                System.out.println("> Error: debes introducir un número.");
+                sc.nextLine(); 
+                continue; 
+            }
 
-         case 1:
-             controlador.altaCliente();
-             break;
+            switch (opcion) {
 
-         case 2:
-             controlador.bajaCliente();
-             break;
+                case 1:
+                    controlador.altaCliente();
+                    break;
 
-         case 3:
-             controlador.modificarCliente();
-             break;
-             
-         case 0:
-         	break;
-         	
-         default:
-         	 System.out.println("Opción incorrecta");
-         }
-     }
+                case 2:
+                    controlador.bajaCliente();
+                    break;
 
-    private void menuVehiculos() {
-        System.out.println("1. Alta vehículo");
-        System.out.println("2. Baja vehículo");
-        System.out.println("3. Modificar vehículo");
+                case 3:
+                    controlador.modificarCliente();
+                    break;
 
-        int opcion = sc.nextInt();
-        sc.nextLine();
+                case 0:
+                    System.out.println("> Volviendo al menú principal.");
+                    break;
 
-        switch (opcion) {
+                default:
+                    System.out.println("> Opción incorrecta.");
+            }
 
-        case 1:
-            controlador.altaVehiculo();
-            break;
-
-        case 2:
-            controlador.bajaVehiculo();
-            break;
-
-        case 3:
-            controlador.modificarVehiculo();
-            break;
-        }
+        } while (opcion != 0);
     }
+
+
+     private void menuVehiculos() {
+    	    int opcion = -1;
+
+    	    do {
+    	        // Mostrar menú
+    	        System.out.println("1. Alta vehículo");
+    	        System.out.println("2. Baja vehículo");
+    	        System.out.println("3. Modificar vehículo");
+    	        System.out.println("4. Salir");
+    	        System.out.print("> Introduce una opción: ");
+
+    	        // Validación
+    	        if (sc.hasNextInt()) {
+    	            opcion = sc.nextInt();
+    	            sc.nextLine();
+    	        } else {
+    	            System.out.println("> Error: debes introducir un número.");
+    	            sc.nextLine();
+    	            continue; 
+    	        }
+
+    	      
+    	        switch (opcion) {
+
+    	            case 1:
+    	                controlador.altaVehiculo();
+    	                break;
+
+    	            case 2:
+    	                controlador.bajaVehiculo();
+    	                break;
+
+    	            case 3:
+    	                controlador.modificarVehiculo();
+    	                break;
+
+    	            case 4:
+    	                System.out.println("> Volviendo al menú principal.");
+    	                break;
+
+    	            default:
+    	                System.out.println("> Opción incorrecta.");
+    	        }
+
+    	    } while (opcion != 4);
+    	}
+
 
     /**
      * Método main que inicializa los DAOs, crea usuarios base,
