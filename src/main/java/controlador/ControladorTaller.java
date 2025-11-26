@@ -60,6 +60,7 @@ public class ControladorTaller {
 
         //Se devuelve que el usuario se ha logueado.
         return usuarioDAO.findByDni(dni);
+        
     }
 
     public void registrarReparacion(String matricula, String desc, double coste, String fecha, String dni) {
