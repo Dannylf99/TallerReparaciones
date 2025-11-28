@@ -1,5 +1,5 @@
 package entities;
 
 public enum Rol {
-	Invitado, Mecanico, Administrador
+	INVITADO , MECANICO, ADMINISTRADOR
 }
