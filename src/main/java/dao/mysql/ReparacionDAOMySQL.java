@@ -41,14 +41,14 @@ public class ReparacionDAOMySQL implements ReparacionDAO {
 		    int resul = pst.executeUpdate();
 		    
 		    if (resul > 0) {
-		        System.out.println("> OK. Usuario insertado correctamente.");
+		        System.out.println("> OK. Reparación insertada correctamente.");
 		        
 		        // Recuperar ID
 		        try (ResultSet generatedKeys = pst.getGeneratedKeys()) {
 		            if (generatedKeys.next()) {
 		                int id = generatedKeys.getInt(1);
 		                r.setId_reparacion(id);
-		                System.out.println("> OK. ID recuperado correctamente: " + id);
+		                System.out.println("> ID de la reparación: " + id);
 		            } else {
 		                System.out.println("> WARNING: No se pudo recuperar el ID de la reparación.");
 		            }
@@ -110,9 +110,9 @@ public class ReparacionDAOMySQL implements ReparacionDAO {
 			int resul = pst.executeUpdate();
 			
 			if (resul > 0) {
-				System.out.println("> OK. Vehículo con matricula" + matricula + "eliminada correctamente.");
+				System.out.println("> OK. Reparación del coche con matricula" + matricula + "eliminada correctamente.");
 			} else {
-				System.out.println("> NOK. Usuario no encontrado.");
+				System.out.println("> NOK. Reparación no encontrada.");
 				return -1;
 			}
 
