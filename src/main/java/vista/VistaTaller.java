@@ -294,7 +294,7 @@ public class VistaTaller {
             System.out.println("1. Alta cliente");
             System.out.println("2. Baja cliente");
             System.out.println("3. Modificar cliente");
-            System.out.println("0. Cerrar sesión");
+            System.out.println("4. Salir");
             System.out.print("> Introduce una opción: ");
 
             // Validación
@@ -321,7 +321,7 @@ public class VistaTaller {
                     controlador.modificarCliente();
                     break;
 
-                case 0:
+                case 4:
                     System.out.println("> Volviendo al menú principal.");
                     break;
 
