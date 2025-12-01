@@ -45,7 +45,7 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 		            if (generatedKeys.next()) {
 		                int id = generatedKeys.getInt(1);
 		                u.setId_usuario(id);
-		                System.out.println("> OK. ID recuperado correctamente: " + id);
+		                System.out.println("> ID asociado al usuario: " + id);
 		            } else {
 		                System.out.println("> WARNING: No se pudo recuperar el ID del usuario.");
 		            }
@@ -77,7 +77,7 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 			PreparedStatement pst = conexion.prepareStatement(sqlUpdate);
 			int resul = pst.executeUpdate();
 			if (resul > 0) {
-				System.out.println("> OK. Usuario con id" + id + "actualizada correctamente.");
+				System.out.println("> OK. Usuario con id " + id + " actualizado correctamente.");
 			} else {
 				System.out.println("> NOK. Usuario no encontrado.");
 				return -1;
@@ -100,7 +100,7 @@ public class UsuarioDAOMySQL implements UsuarioDAO {
 			int resul = pst.executeUpdate();
 			
 			if (resul > 0) {
-				System.out.println("> OK. Usuario con dni" + dni + "eliminada correctamente.");
+				System.out.println("> OK. Usuario con dni " + dni + " eliminado correctamente.");
 			} else {
 				System.out.println("> NOK. Usuario no encontrado.");
 				return -1;
