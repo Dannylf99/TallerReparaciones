@@ -74,7 +74,7 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 			int resul = pst.executeUpdate();
 			
 			if (resul > 0) {
-				System.out.println("> OK. Vehículo con id" + id + "actualizado correctamente.");
+				System.out.println("> OK. Vehículo con id " + id + " actualizado correctamente.");
 			} else {
 				System.out.println("> NOK. Vehículo no encontrado.");
 				return -1;
@@ -98,9 +98,9 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
 			int resul = pst.executeUpdate();
 			
 			if (resul > 0) {
-				System.out.println("> OK. Vehículo con matricula" + matricula + "eliminada correctamente.");
+				System.out.println("> OK. Vehículo con matricula " + matricula + " eliminado correctamente.");
 			} else {
-				System.out.println("> NOK. Usuario no encontrado.");
+				System.out.println("> NOK. Vehículo no encontrado.");
 				return -1;
 			}
 
