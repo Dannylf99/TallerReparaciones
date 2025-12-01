@@ -294,7 +294,7 @@ public class VistaTaller {
             System.out.println("1. Alta cliente");
             System.out.println("2. Baja cliente");
             System.out.println("3. Modificar cliente");
-            System.out.println("4. Salir");
+            System.out.println("0. Salir");
             System.out.print("> Introduce una opción: ");
 
             // Validación
@@ -341,7 +341,7 @@ public class VistaTaller {
     	        System.out.println("1. Alta vehículo");
     	        System.out.println("2. Baja vehículo");
     	        System.out.println("3. Modificar vehículo");
-    	        System.out.println("4. Salir");
+    	        System.out.println("0. Salir");
     	        System.out.print("> Introduce una opción: ");
 
     	        // Validación
@@ -377,7 +377,7 @@ public class VistaTaller {
     	                System.out.println("> Opción incorrecta.");
     	        }
 
-    	    } while (opcion != 4);
+    	    } while (opcion != 0);
     	}
 
 
