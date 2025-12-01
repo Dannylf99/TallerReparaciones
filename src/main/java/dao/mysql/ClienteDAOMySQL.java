@@ -41,7 +41,7 @@ public class ClienteDAOMySQL implements ClienteDAO {
 	                if (generatedKeys.next()) {
 	                    int id = generatedKeys.getInt(1);
 	                    c.setId_Cliente(id);
-	                    System.out.println("> OK. ID del cliente recuperado: " + id);
+	                    System.out.println("> ID del cliente: " + id);
 	                    return id; 
 	                } else {
 	                    System.out.println("> WARNING: No se pudo recuperar el ID del cliente.");
@@ -76,9 +76,9 @@ public class ClienteDAOMySQL implements ClienteDAO {
 			pst.setInt(5, c.getId_Cliente());
 			int resul = pst.executeUpdate();
 			if (resul > 0) {
-				System.out.println("> OK. Persona con id" + c.getId_Cliente() + "actualizada correctamente.");
+				System.out.println("> OK. Cliente con id " + c.getId_Cliente() + " actualizada correctamente.");
 			} else {
-				System.out.println("> NOK. Persona no encontrada.");
+				System.out.println("> NOK. Cliente no encontrado.");
 				return -1;
 			}
 		} catch (SQLException e) {
@@ -99,7 +99,7 @@ public class ClienteDAOMySQL implements ClienteDAO {
 			int resul = pst.executeUpdate();
 			
 			if (resul > 0) {
-				System.out.println("> OK. Cliente con dni" + dni + "eliminada correctamente.");
+				System.out.println("> OK. Cliente con dni " + dni + " eliminado correctamente.");
 			} else {
 				System.out.println("> NOK. Cliente no encontrado.");
 				return -1;
@@ -175,7 +175,7 @@ public class ClienteDAOMySQL implements ClienteDAO {
 		return c;
 			
 		} catch (SQLException e) {
-			System.out.println("> NOK. Persona no encontrada.");
+			System.out.println("> NOK. Cliente no encontrado.");
 			System.out.println("> NOK:" + e.getMessage());
 			return null;
 		}
